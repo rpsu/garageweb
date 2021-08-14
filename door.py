@@ -41,6 +41,13 @@ DoorAutoCloseDelay = 1200
 # Door left open message after seconds (if left fully opened)
 DoorOpenMessageDelay = 900
 
+# On start check if the door is open.
+if GPIO.input(18) == GPIO.LOW:  # Door is Open
+    logger("Door is Open")
+    # Start Door Open Timer
+    DoorOpenTimer = 1
+
+
 try:
     while 1 >= 0:
         time.sleep(1)
