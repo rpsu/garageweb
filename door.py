@@ -54,16 +54,11 @@ try:
             if (currentTimeDate - TimeDoorOpened).seconds > DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
                 logger("Closing Garage Door automatically, since it has been left Open  " +
                        str(math.floor(DoorAutoCloseDelay/60)) + " minutes")
-                time.sleep(5)
-                logger("Setting Pin 11 to " + str(GPIO.HIGH))
-                GPIO.output(11, GPIO.HIGH)
                 time.sleep(2)
-                logger("Setting Pin 11 to " + str(GPIO.LOW))
+                # This triggers the Opening/Closing the door.
                 GPIO.output(11, GPIO.LOW)
-                time.sleep(2)
-                logger("Setting Pin 11 to " + str(GPIO.HIGH))
+                time.sleep(.5)
                 GPIO.output(11, GPIO.HIGH)
-                time.sleep(5)
 
         if GPIO.input(16) == GPIO.HIGH and GPIO.input(18) == GPIO.HIGH:  # Door Status is Unknown
             logger("Door Opening/Closing")
