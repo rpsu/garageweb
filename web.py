@@ -1,8 +1,10 @@
 import time
 from datetime import datetime
-from flask import Flask, render_template, request, Response
-
+from flask import Flask, render_template, request, Response, redirect
 import RPi.GPIO as GPIO
+import os.path
+
+
 # the pin numbers refer to the board connector not the chip
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
@@ -38,6 +40,21 @@ def logger(msg):
         print(msg)
 
 # Fetch user real IP even if flask is running behind proxy.
+
+
+passwd_file = 'garage-password.txt'
+cwd = os.path.dirname(os.path.abspath(__file__))
+file = os.path.join(cwd, passwd_file)
+if os.path.isfile(file):
+    logger("Using passwd from a file: " + file)
+    # Reads all of the content without newlines into a password.
+    with open(file) as f:
+        OpenTriggerPassword = f.read().splitlines()[0]
+else:
+    logger("Passwd file was not found:" + file + ". Using default passwd.")
+    OpenTriggerPassword = "12345678"
+
+logger(OpenTriggerPassword)
 
 
 def user_ip_address():
@@ -94,11 +111,11 @@ def Garage():
         GPIO.output(11, GPIO.HIGH)
         logger("Garage web triggered Opening/Closing completed.")
         time.sleep(2)
-        return app.redirect('/', 200)
+        return redirect('/', 200)
 
     else:
         logger("Wrong password provided, request originated from IP " + user_ip)
-        return app.redirect('/', 400)
+        return redirect('/', 400)
 
 
 @app.route('/Log')
