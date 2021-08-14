@@ -1,6 +1,8 @@
+import RPi.GPIO as GPIO
+import time
+
 print " Control + C to exit Program"
 
-import time
 
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BOARD)    # the pin numbers refer to the board connector not the chip
