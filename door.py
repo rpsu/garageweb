@@ -1,6 +1,7 @@
 import os
 import RPi.GPIO as GPIO
 import time
+import math
 from datetime import datetime
 
 VerboseConsole = False  # Wether or not print messages to console as well.
@@ -47,12 +48,12 @@ try:
                 datetime.now(), '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
             if (currentTimeDate - TimeDoorOpened).seconds > DoorOpenMessageDelay and DoorOpenTimerMessageSent == 0:
                 logger("Your Garage Door has been Open for " +
-                       str(DoorOpenMessageDelay/60) + " minutes")
+                       str(math.floor(DoorOpenMessageDelay/60)) + " minutes")
                 DoorOpenTimerMessageSent = 1
 
-            if (currentTimeDate - TimeDoorOpened).seconds > DoorAutoCloseDelay and DoorOpenTimerMessageSent == 0:
+            if (currentTimeDate - TimeDoorOpened).seconds > DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
                 logger("Closing Garage Door automatically, since it has been left Open  " +
-                       str(DoorAutoCloseDelay/60) + " minutes")
+                       str(math.floor(DoorAutoCloseDelay/60)) + " minutes")
                 time.sleep(5)
                 logger("Setting Pin 11 to " + str(GPIO.HIGH))
                 GPIO.output(11, GPIO.HIGH)
