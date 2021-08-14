@@ -25,6 +25,7 @@ logger("Setting up GPIO Pins")
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 
+GPIO.setup(11, GPIO.OUT)
 GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 logger("Setting up GPIO Pins ... done!")
@@ -74,6 +75,7 @@ try:
                     # Start Door Open Timer
                     TimeDoorOpened = datetime.strptime(datetime.strftime(
                         datetime.now(), '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
+                    logger("Door opened fully: " + str(TimeDoorOpened))
                     DoorOpenTimer = 1
                     DoorOpenTimerMessageSent = 0
 
