@@ -54,8 +54,6 @@ else:
     logger("Passwd file was not found:" + file + ". Using default passwd.")
     OpenTriggerPassword = "12345678"
 
-logger(OpenTriggerPassword)
-
 
 def user_ip_address():
     user_ip = ''
@@ -126,4 +124,5 @@ def logfile():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    #     app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000)
