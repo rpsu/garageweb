@@ -36,9 +36,9 @@ TimeDoorOpened = datetime.strptime(datetime.strftime(
 DoorOpenTimer = 0  # Default start status turns timer off
 DoorOpenTimerMessageSent = 1  # Turn off messages until timer is started
 # Close door automatically after seconds (if left fully opened)
-DoorAutoCloseDelay = 120
+DoorAutoCloseDelay = 1200
 # Door left open message after seconds (if left fully opened)
-DoorOpenMessageDelay = 60
+DoorOpenMessageDelay = 900
 
 try:
     while 1 >= 0:
