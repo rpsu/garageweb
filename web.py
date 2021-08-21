@@ -4,6 +4,8 @@ from flask import Flask, render_template, request, Response, redirect
 import RPi.GPIO as GPIO
 import os.path
 
+fileName = os.path.basename(__file__)
+
 
 # the pin numbers refer to the board connector not the chip
 GPIO.setmode(GPIO.BOARD)
@@ -34,7 +36,7 @@ VerboseConsole = False  # Wether or not print messages to console as well.
 def logger(msg):
     logfile = open("/home/pi/GarageWeb/static/log.txt", "a")
     logfile.write(datetime.now().strftime(
-        "%Y-%m-%d %H:%M:%S [web.py] -- " + msg + "\n"))
+        "%Y-%m-%d %H:%M:%S [" + fileName + "] - - " + msg + "\n"))
     logfile.close()
     if VerboseConsole == True:
         print(msg)

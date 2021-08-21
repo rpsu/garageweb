@@ -2,15 +2,19 @@ import os
 import RPi.GPIO as GPIO
 import time
 import math
+import os.path
+
 from datetime import datetime
 
 VerboseConsole = False  # Wether or not print messages to console as well.
+
+fileName = os.path.basename(__file__)
 
 
 def logger(msg):
     logfile = open("/home/pi/GarageWeb/static/log.txt", "a")
     logfile.write(datetime.now().strftime(
-        "%Y-%m-%d %H:%M:%S [log.py] -- " + msg + "\n"))
+        "%Y-%m-%d %H:%M:%S [" + fileName + "] -- " + msg + "\n"))
     logfile.close()
     if VerboseConsole == True:
         print(msg)
