@@ -2,13 +2,21 @@
 # /etc/init.d/garage
 ### BEGIN INIT INFO
 # Provides:          garage
-# Required-Start:    $remote_fs $network $portmap $syslog $time
-# Required-Stop:     $remote_fs $network $portmap $syslog $time
+# Required-Start:    $all
+# Required-Stop:     $all
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Start Garage door management at boot time
 # Description:       Enable Garage door management and logging service provided by daemon.
 ### END INIT INFO
+
+# ***************** #
+# *** IMPORTANT *** #
+# ***************** #
+# Required-Start MUST BE $all, in order to this script start only after all other services
+# have been started. If not the service will boot before the GPIO pins control is up,
+# and the control starting will open the relay behind PIN 11 (ie. "press the open button" and
+# hence open the door).
 
 # USAGE: 
 # 1. Save this file to the Raspberry Pi as 
@@ -97,16 +105,19 @@ case "$1" in
     if [ -f /var/run/garage.${F}.pid ]; then
       PID=$(cat /var/run/garage.${F}.pid)
       echo Kill ${F} process $PID
-      pkill -F /var/run/garage.${F}.pid && rm /var/run/garage.${F}.pid || echo Killing PID $PID failed. 
+      pkill -F /var/run/garage.${F}.pid || echo Killing PID $PID failed.
+      rm /var/run/garage.${F}.pid || echo Removing PID $PID failed.
     fi
     ;;
+
   stop-web)
     echo "Stopping Garage Web"
     F=web.py
     if [ -f /var/run/garage.${F}.pid ]; then
       PID=$(cat /var/run/garage.${F}.pid)
       echo Kill ${F} process $PID
-      pkill -F /var/run/garage.${F}.pid && rm /var/run/garage.${F}.pid || echo Killing PID $PID failed. 
+      pkill -F /var/run/garage.${F}.pid || echo Killing PID $PID failed.
+      rm /var/run/garage.${F}.pid || echo Removing PID $PID failed.
     fi
     PID=$(ps -ef | grep web.py | grep python | awk {'print $2'})
     if [ ! -z "$PID" ]; then 
@@ -114,10 +125,10 @@ case "$1" in
       kill $PID 
     fi
     ;;
+
   help|*)
     echo "Usage:"
-    echo "service garage {start|stop|restart|start-web|start-door|stop-web|stop-door|help}"
-    exit 1
+    echo "service garage {start|stop|restart|start-web|start-door|stop-web|stop-door|status|help}"
     ;;
 esac
 
