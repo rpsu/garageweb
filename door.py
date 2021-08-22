@@ -29,9 +29,9 @@ def logger(msg):
         print(msg)
 
 
-logger('Hello!')
+logger('Hello from monitoring!')
 
-print "Control + C to exit Program"
+print("Control + C to exit Program")
 
 
 logger("Setting up GPIO Pins")
@@ -42,16 +42,24 @@ logger("Setting up GPIO Pins")
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 
-# Specify an initial value for your output channel.
-# HIGH = connected relay is turned off.
-GPIO.setup(PINS_BUTTON_OPEN, GPIO.OUT, initial=GPIO.HIGH)
-if PINS_BUTTON_OPEN != PINS_BUTTON_CLOSE:
-    GPIO.setup(PINS_BUTTON_CLOSE, GPIO.OUT, initial=GPIO.HIGH)
+# Set up the PINs as an input with a pull-up resistor.
+# These will monitor door state.
+GPIO.setup(SWITCH_UPPER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(SWITCH_LOWER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-GPIO.setup(SWITCH_LOWER, GPIO.IN)
-GPIO.setup(SWITCH_UPPER, GPIO.IN)
+# Specify an initial value for your output channel.
+GPIO.setup(PINS_BUTTON_OPEN, GPIO.OUT)
+if PINS_BUTTON_OPEN != PINS_BUTTON_CLOSE:
+    GPIO.setup(PINS_BUTTON_CLOSE, GPIO.OUT)
+
 logger("Setting up GPIO Pins ... done!")
 time.sleep(1)
+logger("Checking the initial state!")
+state = 'not' if GPIO.input(SWITCH_UPPER) == GPIO.LOW else ''
+logger('"Door Open" switch is ' + state + ' closed.')
+state = 'not' if GPIO.input(SWITCH_LOWER) == GPIO.LOW else ''
+logger('"Door Closed" switch is ' + state + ' closed.')
+
 
 TimeDoorOpened = datetime.strptime(datetime.strftime(
     datetime.now(), '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')  # Default Time
@@ -63,9 +71,9 @@ DoorAutoCloseDelay = 1200
 # Door left open message after seconds (if left fully opened)
 DoorOpenMessageDelay = 900
 
-# On start check if the door is open.
+# Start the timer if door is open at the boot time.
 if GPIO.input(SWITCH_UPPER) == GPIO.LOW:  # Door is Open
-    logger("Door is Open")
+    logger("Door is Open on bootup.")
     # Start Door Open Timer
     DoorOpenTimer = 1
 
@@ -86,14 +94,15 @@ try:
                        str(math.floor(DoorAutoCloseDelay/60)) + " minutes")
                 time.sleep(2)
                 # This triggers the Opening/Closing the door.
-                GPIO.output(11, GPIO.LOW)
+                GPIO.output(PINS_BUTTON_CLOSE, GPIO.LOW)
                 time.sleep(.5)
-                GPIO.output(11, GPIO.HIGH)
+                GPIO.output(PINS_BUTTON_CLOSE, GPIO.HIGH)
 
         # Door Status is Unknown
         if GPIO.input(SWITCH_LOWER) == GPIO.HIGH and GPIO.input(SWITCH_UPPER) == GPIO.HIGH:
             logger("Door Opening/Closing")
             while GPIO.input(SWITCH_LOWER) == GPIO.HIGH and GPIO.input(SWITCH_UPPER) == GPIO.HIGH:
+                # Door is not closed nor open.
                 time.sleep(.5)
             else:
                 if GPIO.input(SWITCH_LOWER) == GPIO.LOW:  # Door is Closed
@@ -111,5 +120,5 @@ try:
 
 
 except KeyboardInterrupt:
-    logger("Log Program Shutdown -- Goodbye!")
+    logger("Monitoring is shut down -- Goodbye!")
     GPIO.cleanup()
