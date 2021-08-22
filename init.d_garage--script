@@ -10,6 +10,14 @@
 # Description:       Enable Garage door management and logging service provided by daemon.
 ### END INIT INFO
 
+# ***************** #
+# *** IMPORTANT *** #
+# ***************** #
+# Required-Start MUST BE $all, in order to this script start only after all other services
+# have been started. If not the service will boot before the GPIO pins control is up,
+# and the control starting will open the relay behind PIN 11 (ie. "press the open button" and
+# hence open the door).
+
 # USAGE: 
 # 1. Save this file to the Raspberry Pi as 
 # /etc/init.d/garage
