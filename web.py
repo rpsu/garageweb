@@ -110,9 +110,8 @@ def add_header(resp):
     resp.headers['Cache-Control'] = 'public, max-age=0'
     return resp
 
-# Main route for GET requests.
 
-
+# Main route for GET requests
 @app.route('/', methods=['GET'])
 def index():
     user_ip = user_ip_address()
@@ -133,17 +132,24 @@ def index():
 # Main route for POST requests (ie. door open/close requests)
 
 
-@app.route('/', methods=['POST'])
-def Garage():
+@ app.route('/', methods=['POST'])
+def openTheDoorPlease():
     user_ip = user_ip_address()
+    status = door_status()
     name = request.form['garagecode']
     # the Password that Opens Garage Door (Code if Password is Correct)
     if name == OpenTriggerPassword:
         logger("Triggered Opening/Closing (IP: " + user_ip + ")")
         # This triggers the Opening/Closing the door.
-        GPIO.output(11, GPIO.LOW)
-        time.sleep(.5)
-        GPIO.output(11, GPIO.HIGH)
+        if status == 'opened':
+            GPIO.output(PINS_BUTTON_CLOSE, GPIO.LOW)
+            time.sleep(.5)
+            GPIO.output(PINS_BUTTON_CLOSE, GPIO.HIGH)
+        elif status == 'closed':
+            GPIO.output(PINS_BUTTON_OPEN, GPIO.LOW)
+            time.sleep(.5)
+            GPIO.output(PINS_BUTTON_OPEN, GPIO.HIGH)
+
         logger("Triggered Opening/Closing completed.")
         time.sleep(2)
         url = url_for('Garage')
@@ -154,12 +160,11 @@ def Garage():
     else:
         resp = app.Response('Wrong password')
         logger("Wrong password provided, request originated from IP " + user_ip)
-        url = url_for('Garage')
-        resp.headers['Location'] = url
-        return resp
+        return Response(
+            'Wrong password - no access.', 401)
 
 
-@app.route('/Log')
+@app.route('/log')
 def logfile():
     user_ip = user_ip_address()
     logger("Access to route /Log from IP " + user_ip)
