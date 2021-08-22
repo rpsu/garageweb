@@ -41,7 +41,9 @@ GPIO.setwarnings(False)
 GPIO.setup(SWITCH_UPPER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(SWITCH_LOWER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# Setup OPEN & CLOSE relay control.
+# Setup OPEN & CLOSE relay control. The output
+# must be set right after in order to the relay not
+# be set with a wrong value (LOW).
 GPIO.setup(PINS_BUTTON_OPEN, GPIO.OUT)
 GPIO.output(PINS_BUTTON_OPEN, GPIO.HIGH)
 if PINS_BUTTON_OPEN != PINS_BUTTON_CLOSE:
