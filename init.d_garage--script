@@ -105,16 +105,19 @@ case "$1" in
     if [ -f /var/run/garage.${F}.pid ]; then
       PID=$(cat /var/run/garage.${F}.pid)
       echo Kill ${F} process $PID
-      pkill -F /var/run/garage.${F}.pid && rm /var/run/garage.${F}.pid || echo Killing PID $PID failed. 
+      pkill -F /var/run/garage.${F}.pid || echo Killing PID $PID failed.
+      rm /var/run/garage.${F}.pid || echo Removing PID $PID failed.
     fi
     ;;
+
   stop-web)
     echo "Stopping Garage Web"
     F=web.py
     if [ -f /var/run/garage.${F}.pid ]; then
       PID=$(cat /var/run/garage.${F}.pid)
       echo Kill ${F} process $PID
-      pkill -F /var/run/garage.${F}.pid && rm /var/run/garage.${F}.pid || echo Killing PID $PID failed. 
+      pkill -F /var/run/garage.${F}.pid || echo Killing PID $PID failed.
+      rm /var/run/garage.${F}.pid || echo Removing PID $PID failed.
     fi
     PID=$(ps -ef | grep web.py | grep python | awk {'print $2'})
     if [ ! -z "$PID" ]; then 
@@ -122,10 +125,10 @@ case "$1" in
       kill $PID 
     fi
     ;;
+
   help|*)
     echo "Usage:"
-    echo "service garage {start|stop|restart|start-web|start-door|stop-web|stop-door|help}"
-    exit 1
+    echo "service garage {start|stop|restart|start-web|start-door|stop-web|stop-door|status|help}"
     ;;
 esac
 
