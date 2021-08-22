@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 
-print " Control + C to exit Program"
+print("Control + C to exit Program")
 
 VerboseConsole = True
 
