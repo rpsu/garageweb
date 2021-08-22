@@ -6,22 +6,32 @@ import os.path
 
 fileName = os.path.basename(__file__)
 
+# Define which GPIO pins do what.
+# Open and close may be the same or different.
+PINS_BUTTON_OPEN = 11
+PINS_BUTTON_CLOSE = 11
+# Upper magnetic switch *closes* (value 0) when door is open.
+SWITCH_UPPER = 18
+# Upper magnetic switch *closes* (value 0) when door is closed.
+SWITCH_LOWER = 16
 
-# the pin numbers refer to the board connector not the chip
+
+# Use BOARD mode. The pin numbers refer to the **BOARD** connector not the chip.
+# @see https://pinout.xyz/pinout/3v3_power# and the smaller numbers next to the PINs
+# in the graph
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
-# set up pin ?? (one of the above listed pins) as an input with a pull-up resistor
-GPIO.setup(16, GPIO.IN, GPIO.PUD_UP)
-# set up pin ?? (one of the above listed pins) as an input with a pull-up resistor
-GPIO.setup(18, GPIO.IN, GPIO.PUD_UP)
-# GPIO.setup(7, GPIO.OUT)
-# GPIO.output(7, GPIO.HIGH)
-GPIO.setup(11, GPIO.OUT)
-GPIO.output(11, GPIO.HIGH)
-# GPIO.setup(13, GPIO.OUT)
-# GPIO.output(13, GPIO.HIGH)
-# GPIO.setup(15, GPIO.OUT)
-# GPIO.output(15, GPIO.HIGH)
+
+# Set up the PINs as an input with a pull-up resistor.
+# These will monitor door state.
+GPIO.setup(SWITCH_UPPER, GPIO.IN)
+GPIO.setup(SWITCH_LOWER, GPIO.IN)
+
+# Specify an initial value for your output channel.
+# HIGH = connected relay is turned off.
+GPIO.setup(PINS_BUTTON_OPEN, GPIO.OUT, GPIO.HIGH)
+if PINS_BUTTON_OPEN != PINS_BUTTON_CLOSE:
+    GPIO.setup(PINS_BUTTON_CLOSE, GPIO.OUT, GPIO.HIGH)
 
 # Wtih static_url_path Flask serves all assets under the /static
 # with no further configuration.
