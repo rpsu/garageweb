@@ -10,6 +10,15 @@ VerboseConsole = False  # Wether or not print messages to console as well.
 
 fileName = os.path.basename(__file__)
 
+# Define which GPIO pins do what.
+# Open and close may be the same or different.
+PINS_BUTTON_OPEN = 11
+PINS_BUTTON_CLOSE = 11
+# Upper magnetic switch *closes* (value 0) when door is open.
+SWITCH_UPPER = 18
+# Upper magnetic switch *closes* (value 0) when door is closed.
+SWITCH_LOWER = 16
+
 
 def logger(msg):
     logfile = open("/home/pi/GarageWeb/static/log.txt", "a")
@@ -22,16 +31,25 @@ def logger(msg):
 
 logger('Hello!')
 
-print " Control + C to exit Program"
+print "Control + C to exit Program"
 
 
 logger("Setting up GPIO Pins")
+
+# Use BOARD mode. The pin numbers refer to the **BOARD** connector not the chip.
+# @see https://pinout.xyz/pinout/3v3_power# and the smaller numbers next to the PINs
+# in the graph
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 
-GPIO.setup(11, GPIO.OUT)
-GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# Specify an initial value for your output channel.
+# HIGH = connected relay is turned off.
+GPIO.setup(PINS_BUTTON_OPEN, GPIO.OUT, initial=GPIO.HIGH)
+if PINS_BUTTON_OPEN != PINS_BUTTON_CLOSE:
+    GPIO.setup(PINS_BUTTON_CLOSE, GPIO.OUT, initial=GPIO.HIGH)
+
+GPIO.setup(SWITCH_LOWER, GPIO.IN)
+GPIO.setup(SWITCH_UPPER, GPIO.IN)
 logger("Setting up GPIO Pins ... done!")
 time.sleep(1)
 
@@ -46,7 +64,7 @@ DoorAutoCloseDelay = 1200
 DoorOpenMessageDelay = 900
 
 # On start check if the door is open.
-if GPIO.input(18) == GPIO.LOW:  # Door is Open
+if GPIO.input(SWITCH_UPPER) == GPIO.LOW:  # Door is Open
     logger("Door is Open")
     # Start Door Open Timer
     DoorOpenTimer = 1
@@ -72,16 +90,17 @@ try:
                 time.sleep(.5)
                 GPIO.output(11, GPIO.HIGH)
 
-        if GPIO.input(16) == GPIO.HIGH and GPIO.input(18) == GPIO.HIGH:  # Door Status is Unknown
+        # Door Status is Unknown
+        if GPIO.input(SWITCH_LOWER) == GPIO.HIGH and GPIO.input(SWITCH_UPPER) == GPIO.HIGH:
             logger("Door Opening/Closing")
-            while GPIO.input(16) == GPIO.HIGH and GPIO.input(18) == GPIO.HIGH:
+            while GPIO.input(SWITCH_LOWER) == GPIO.HIGH and GPIO.input(SWITCH_UPPER) == GPIO.HIGH:
                 time.sleep(.5)
             else:
-                if GPIO.input(16) == GPIO.LOW:  # Door is Closed
+                if GPIO.input(SWITCH_LOWER) == GPIO.LOW:  # Door is Closed
                     logger("Door Closed")
                     DoorOpenTimer = 0
 
-                if GPIO.input(18) == GPIO.LOW:  # Door is Open
+                if GPIO.input(SWITCH_UPPER) == GPIO.LOW:  # Door is Open
                     logger("Door Open")
                     # Start Door Open Timer
                     TimeDoorOpened = datetime.strptime(datetime.strftime(
