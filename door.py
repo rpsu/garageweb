@@ -53,11 +53,6 @@ if PINS_BUTTON_OPEN != PINS_BUTTON_CLOSE:
     GPIO.output(PINS_BUTTON_OPEN, GPIO.HIGH)
 
 logger("Setting up GPIO Pins ... done!")
-state = 'not' if GPIO.input(SWITCH_UPPER) == GPIO.LOW else ''
-logger('"Door Open" switch is ' + state + ' open.')
-state = 'not' if GPIO.input(SWITCH_LOWER) == GPIO.LOW else ''
-logger('"Door Closed" switch is ' + state + ' open.')
-
 
 TimeDoorOpened = datetime.strptime(datetime.strftime(
     datetime.now(), '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')  # Default Time
@@ -74,7 +69,6 @@ if GPIO.input(SWITCH_UPPER) == GPIO.LOW:  # Door is Open
     logger("Door is Open when starging up. Turn Door opened timer initally on.")
     # Start Door Open Timer
     DoorOpenTimer = 1
-
 
 try:
     while 1 >= 0:
