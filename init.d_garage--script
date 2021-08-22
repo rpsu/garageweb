@@ -2,8 +2,8 @@
 # /etc/init.d/garage
 ### BEGIN INIT INFO
 # Provides:          garage
-# Required-Start:    $remote_fs $network $portmap $syslog $time
-# Required-Stop:     $remote_fs $network $portmap $syslog $time
+# Required-Start:    $all
+# Required-Stop:     $all
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Start Garage door management at boot time
