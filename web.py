@@ -1,8 +1,10 @@
+from os import stat
 import time
 from datetime import datetime
-from flask import Flask, url_for, request, Response, redirect
+from flask import Flask, url_for, request, Response
 import RPi.GPIO as GPIO
 import os.path
+import json
 
 fileName = os.path.basename(__file__)
 OpenTriggerPassword = "12345678"
@@ -67,6 +69,24 @@ if os.path.isfile(file):
         OpenTriggerPassword = f.read().splitlines()[0]
 else:
     logger("Passwd file was not found:" + file + ". Using default passwd.")
+
+
+# Read door status from magnetic switches connected to GPIO
+def door_status():
+    if GPIO.input(SWITCH_LOWER) == GPIO.HIGH and GPIO.input(SWITCH_UPPER) == GPIO.HIGH:
+        if Debug == True:
+            logger("API: Garage is Opening/Closing")
+        return 'in-between'
+    else:
+        if GPIO.input(SWITCH_LOWER) == GPIO.LOW:
+            if Debug == True:
+                logger("Garage is Closed")
+            return 'closed'
+
+        if GPIO.input(SWITCH_UPPER) == GPIO.LOW:
+            if Debug == True:
+                logger("Garage is Open")
+            return 'open'
 
 
 # Fetch user real IP even if flask is running behind proxy.
