@@ -29,11 +29,9 @@ def logger(msg):
         print(msg)
 
 
-logger('Hello from monitoring!')
-
 print("Control + C to exit Program")
 
-
+logger('Hello from Door Monitoring!')
 logger("Setting up GPIO Pins")
 
 # Use BOARD mode. The pin numbers refer to the **BOARD** connector not the chip.
@@ -47,18 +45,18 @@ GPIO.setwarnings(False)
 GPIO.setup(SWITCH_UPPER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(SWITCH_LOWER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# Specify an initial value for your output channel.
+# Setup OPEN & CLOSE relay control.
 GPIO.setup(PINS_BUTTON_OPEN, GPIO.OUT)
+GPIO.output(PINS_BUTTON_OPEN, GPIO.HIGH)
 if PINS_BUTTON_OPEN != PINS_BUTTON_CLOSE:
     GPIO.setup(PINS_BUTTON_CLOSE, GPIO.OUT)
+    GPIO.output(PINS_BUTTON_OPEN, GPIO.HIGH)
 
 logger("Setting up GPIO Pins ... done!")
-time.sleep(1)
-logger("Checking the initial state!")
 state = 'not' if GPIO.input(SWITCH_UPPER) == GPIO.LOW else ''
-logger('"Door Open" switch is ' + state + ' closed.')
+logger('"Door Open" switch is ' + state + ' open.')
 state = 'not' if GPIO.input(SWITCH_LOWER) == GPIO.LOW else ''
-logger('"Door Closed" switch is ' + state + ' closed.')
+logger('"Door Closed" switch is ' + state + ' open.')
 
 
 TimeDoorOpened = datetime.strptime(datetime.strftime(
@@ -73,7 +71,7 @@ DoorOpenMessageDelay = 900
 
 # Start the timer if door is open at the boot time.
 if GPIO.input(SWITCH_UPPER) == GPIO.LOW:  # Door is Open
-    logger("Door is Open on bootup.")
+    logger("Door is Open when starging up. Turn Door opened timer initally on.")
     # Start Door Open Timer
     DoorOpenTimer = 1
 
@@ -90,7 +88,7 @@ try:
                 DoorOpenTimerMessageSent = 1
 
             if (currentTimeDate - TimeDoorOpened).seconds > DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
-                logger("Closing Garage Door automatically, since it has been left Open  " +
+                logger("Closing Garage Door automatically, since it has been left Open for  " +
                        str(math.floor(DoorAutoCloseDelay/60)) + " minutes")
                 time.sleep(2)
                 # This triggers the Opening/Closing the door.
