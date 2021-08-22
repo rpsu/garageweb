@@ -64,7 +64,6 @@ if os.path.isfile(file):
         OpenTriggerPassword = f.read().splitlines()[0]
 else:
     logger("Passwd file was not found:" + file + ". Using default passwd.")
-    OpenTriggerPassword = "12345678"
 
 
 def user_ip_address():
