@@ -117,18 +117,24 @@ def Garage():
     name = request.form['garagecode']
     # the Password that Opens Garage Door (Code if Password is Correct)
     if name == OpenTriggerPassword:
-        logger("Garage web triggered Opening/Closing (IP: " + user_ip + ")")
+        logger("Triggered Opening/Closing (IP: " + user_ip + ")")
         # This triggers the Opening/Closing the door.
         GPIO.output(11, GPIO.LOW)
         time.sleep(.5)
         GPIO.output(11, GPIO.HIGH)
-        logger("Garage web triggered Opening/Closing completed.")
+        logger("Triggered Opening/Closing completed.")
         time.sleep(2)
-        return redirect('/', 200)
+        url = url_for('Garage')
+        resp = app.Response('Redirecting to <a href="' + url + '">/</a >.')
+        resp.headers['Location'] = '/'
+        return resp
 
     else:
+        resp = app.Response('Wrong password')
         logger("Wrong password provided, request originated from IP " + user_ip)
-        return redirect('/', 400)
+        url = url_for('Garage')
+        resp.headers['Location'] = url
+        return resp
 
 
 @app.route('/Log')
