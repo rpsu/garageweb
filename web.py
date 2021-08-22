@@ -1,21 +1,34 @@
 import time
 from datetime import datetime
-from flask import Flask, render_template, request, Response, redirect
+from flask import Flask, url_for, request, Response, redirect
 import RPi.GPIO as GPIO
 import os.path
 
 fileName = os.path.basename(__file__)
 OpenTriggerPassword = "12345678"
 VerboseConsole = False  # Wether or not print messages to console as well.
-
+Debug = False
 # Define which GPIO pins do what.
 # Open and close may be the same or different.
 PINS_BUTTON_OPEN = 11
 PINS_BUTTON_CLOSE = 11
 # Upper magnetic switch *closes* (value 0) when door is open.
 SWITCH_UPPER = 18
-# Lower magnetic switch *closes* (value 0) when door is closed.
+# Upper magnetic switch *closes* (value 0) when door is closed.
 SWITCH_LOWER = 16
+
+
+def logger(msg):
+    logfile = open("/home/pi/GarageWeb/static/log.txt", "a")
+    logfile.write(datetime.now().strftime(
+        "%Y-%m-%d %H:%M:%S [" + fileName + "] - - " + msg + "\n"))
+    logfile.close()
+    if VerboseConsole == True:
+        print(msg)
+
+
+logger('Hello from Door Monitoring!')
+logger("Setting up GPIO Pins")
 
 # Use BOARD mode. The pin numbers refer to the **BOARD** connector not the chip.
 # @see https://pinout.xyz/pinout/3v3_power# and the smaller numbers next to the PINs
@@ -28,23 +41,18 @@ GPIO.setwarnings(False)
 GPIO.setup(SWITCH_UPPER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(SWITCH_LOWER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# Specify an initial value for your output channel.
+# Setup OPEN & CLOSE relay control.
 GPIO.setup(PINS_BUTTON_OPEN, GPIO.OUT)
+GPIO.output(PINS_BUTTON_OPEN, GPIO.HIGH)
 if PINS_BUTTON_OPEN != PINS_BUTTON_CLOSE:
     GPIO.setup(PINS_BUTTON_CLOSE, GPIO.OUT)
+    GPIO.output(PINS_BUTTON_CLOSE, GPIO.HIGH)
+
+logger("Setting up GPIO Pins ... done!")
 
 # With static_url_path Flask serves all assets under the /static
 # with no further configuration.
 app = Flask(__name__, static_url_path='/static')
-
-
-def logger(msg):
-    logfile = open("/home/pi/GarageWeb/static/log.txt", "a")
-    logfile.write(datetime.now().strftime(
-        "%Y-%m-%d %H:%M:%S [" + fileName + "] - - " + msg + "\n"))
-    logfile.close()
-    if VerboseConsole == True:
-        print(msg)
 
 
 passwd_file = 'garage-password.txt'
@@ -87,14 +95,17 @@ def add_header(resp):
 def index():
     user_ip = user_ip_address()
     if GPIO.input(16) == GPIO.HIGH and GPIO.input(18) == GPIO.HIGH:
-        logger("(web) Garage is Opening/Closing")
+        if Debug == True:
+            logger("Garage is Opening/Closing")
         return app.send_static_file('Question.html')
     else:
         if GPIO.input(16) == GPIO.LOW:
-            logger("(web) Garage is Closed")
+            if Debug == True:
+                logger("Garage is Closed")
             return app.send_static_file('Closed.html')
         if GPIO.input(18) == GPIO.LOW:
-            logger("(web) Garage is Open")
+            if Debug == True:
+                logger("Garage is Open")
             return app.send_static_file('Open.html')
 
 # Main route for POST requests (ie. door open/close requests)
