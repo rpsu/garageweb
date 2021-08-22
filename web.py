@@ -115,19 +115,33 @@ def add_header(resp):
 @app.route('/', methods=['GET'])
 def index():
     user_ip = user_ip_address()
-    if GPIO.input(16) == GPIO.HIGH and GPIO.input(18) == GPIO.HIGH:
-        if Debug == True:
-            logger("Garage is Opening/Closing")
-        return app.send_static_file('Question.html')
+    logger("Request from IP " + user_ip)
+    return app.send_static_file('index.html')
+
+
+# REST API, /door endpoint
+@app.route('/api/door', methods=['GET'])
+def api():
+    status = door_status()
+
+    response = {
+        'status': status if status != None else None,
+        'color': None,
+        'image': None,
+    }
+    if status == 'in-between':
+        response['color'] = 'yellow'
+        response['image'] = 'GarageQuestion.gif'
+    elif status == 'closed':
+        response['color'] = 'green'
+        response['image'] = 'GarageGreen.gif'
+    elif status == 'opened':
+        response['color'] = 'red'
+        response['image'] = 'GarageRed.gif'
     else:
-        if GPIO.input(16) == GPIO.LOW:
-            if Debug == True:
-                logger("Garage is Closed")
-            return app.send_static_file('Closed.html')
-        if GPIO.input(18) == GPIO.LOW:
-            if Debug == True:
-                logger("Garage is Open")
-            return app.send_static_file('Open.html')
+        logger('** ALERT ** Unknown door status response: ' + status)
+
+    return json.dumps(response)
 
 # Main route for POST requests (ie. door open/close requests)
 
@@ -151,14 +165,12 @@ def openTheDoorPlease():
             GPIO.output(PINS_BUTTON_OPEN, GPIO.HIGH)
 
         logger("Triggered Opening/Closing completed.")
-        time.sleep(2)
-        url = url_for('Garage')
-        resp = app.Response('Redirecting to <a href="' + url + '">/</a >.')
-        resp.headers['Location'] = '/'
-        return resp
+        headers = dict()
+        headers['Location'] = url_for('index')
+        return Response(
+            'Button pressed.', 304, headers)
 
     else:
-        resp = app.Response('Wrong password')
         logger("Wrong password provided, request originated from IP " + user_ip)
         return Response(
             'Wrong password - no access.', 401)
