@@ -6,10 +6,11 @@ import RPi.GPIO as GPIO
 import os.path
 import json
 
+Debug = False
+VerboseConsole = False  # Wether or not print messages to console as well.
 fileName = os.path.basename(__file__)
 OpenTriggerPassword = "12345678"
-VerboseConsole = False  # Wether or not print messages to console as well.
-Debug = False
+
 # Define which GPIO pins do what.
 # Open and close may be the same or different.
 PINS_BUTTON_OPEN = 11
@@ -93,9 +94,8 @@ def door_status():
 def user_ip_address():
     user_ip = ''
     if 'X-Forwarded-For' in request.headers:
-        proxy_data = request.headers['X-Forwarded-For']
-        ip_list = proxy_data.split(',')
-        user_ip = ip_list[0]  # first address in list is User IP
+        user_ip = request.remote_addr + ', ' + \
+            request.headers['X-Forwarded-For']
     else:
         user_ip = request.remote_addr  # For local development
     return user_ip

@@ -6,8 +6,8 @@ import os.path
 
 from datetime import datetime
 
+Debug = False
 VerboseConsole = False  # Wether or not print messages to console as well.
-
 fileName = os.path.basename(__file__)
 
 # Define which GPIO pins do what.
