@@ -3,8 +3,9 @@ import RPi.GPIO as GPIO
 import time
 import math
 import os.path
-
 from datetime import datetime
+
+print("Control + C to exit Program")
 
 Debug = False
 VerboseConsole = False  # Wether or not print messages to console as well.
@@ -28,8 +29,6 @@ def logger(msg):
     if VerboseConsole == True:
         print(msg)
 
-
-print("Control + C to exit Program")
 
 logger('Hello from Door Monitoring!')
 logger("Setting up GPIO Pins")

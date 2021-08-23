@@ -30,7 +30,7 @@ def logger(msg):
         print(msg)
 
 
-logger('Hello from Door Monitoring!')
+logger('Hello from Web service!')
 logger("Setting up GPIO Pins")
 
 # Use BOARD mode. The pin numbers refer to the **BOARD** connector not the chip.
