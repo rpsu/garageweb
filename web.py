@@ -130,7 +130,7 @@ def api():
         'image': None,
     }
     if status == 'in-between':
-        response['color'] = 'yellow'
+        response['color'] = 'orange'
         response['image'] = 'GarageQuestion.gif'
     elif status == 'closed':
         response['color'] = 'green'
