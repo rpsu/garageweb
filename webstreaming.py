@@ -1,6 +1,6 @@
 # import the necessary packages
-# motion_detection is relative path.
-from motion_detection import SingleMotionDetector
+# motion_detection.singlemotiondetector equals to motion_detection/singlemotiondetector.py in filesystem.
+from motion_detection.singlemotiondetector import SingleMotionDetector
 from imutils.video import VideoStream
 from flask import Response
 from flask import Flask

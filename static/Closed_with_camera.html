@@ -23,22 +23,20 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" type="text/css" href="/static/stylesheet.css">
     <script type="text/javascript" src="/static/rest.js" defer></script>
-    <script type="text/javascript" src="/static/notify.js" defer></script>
 </head>
 
-<body class="">
+<body class="green">
     <div class="container">
-        <div class="error"></div>
         <form action="/" method="post" id="garageform">
             <input id="garagecode" name="garagecode" type="text " onfocus="hold()" onblur="release()" pattern="[a-z0-9\s]*" value="">
         </form>
-        <a href="/"><img id="statusImage" src="/static/images/GarageRed.gif"></a>
-        <div class="logs-link">
-            <a href="/log">Click for Log File</a>
-        </div>
-        <div class="notifications-button">
-            <button onclick="showNotification()">Notify me!</button>
-        </div>
+        <a href="/">
+            <h3>Camera</h3>
+            <img src="stream.mjpg" width="640" height="480" />
+        </a>
+        <br />
+        <br />
+        <a href="/Log">Click for Log File</a>
     </div>
 </body>
 
