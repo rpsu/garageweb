@@ -166,6 +166,10 @@ def openTheDoorPlease():
             GPIO.output(PINS_BUTTON_OPEN, GPIO.LOW)
             time.sleep(.5)
             GPIO.output(PINS_BUTTON_OPEN, GPIO.HIGH)
+        elif status == 'in-between':
+            GPIO.output(PINS_BUTTON_CLOSE, GPIO.LOW)
+            time.sleep(.5)
+            GPIO.output(PINS_BUTTON_CLOSE, GPIO.HIGH)
 
         logger("Triggered Opening/Closing completed.")
         headers = dict()
