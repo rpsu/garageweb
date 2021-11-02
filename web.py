@@ -87,7 +87,7 @@ def door_status():
         if GPIO.input(SWITCH_UPPER) == GPIO.LOW:
             if Debug == True:
                 logger("Garage is Open")
-            return 'open'
+            return 'opened'
 
 
 # Fetch user real IP even if flask is running behind proxy.
