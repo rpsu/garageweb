@@ -5,11 +5,11 @@ const restApiDoor = () => {
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     request.responseType = 'json';
     request.onload = () => {
+        const resp = request.response || null;
         if (request.status === 200) {
-            const resp = request.response;
             if (resp.status && resp.image && resp.color) {
                 document.body.className = resp.color;
-                var image = document.getElementById('status-imge');
+                var image = document.getElementById('statusImage');
                 image.src = '/static/images/' + resp.image
             }
         } else {
