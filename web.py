@@ -1,7 +1,7 @@
 from os import stat
 import time
 from datetime import datetime
-from flask import Flask, url_for, request, Response
+from flask import Flask, url_for, request, Response, make_response
 import RPi.GPIO as GPIO
 import os.path
 import json
@@ -141,7 +141,10 @@ def api():
     else:
         logger('** ALERT ** Unknown door status response: ' + status)
 
-    return json.dumps(response)
+    resp = make_response(json.dumps(response))
+    resp.headers['Content-Type'] = 'application/json'
+
+    return resp
 
 # Main route for POST requests (ie. door open/close requests)
 
