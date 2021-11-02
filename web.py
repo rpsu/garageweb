@@ -1,37 +1,18 @@
 from os import stat
 import time
-from datetime import datetime
 from flask import Flask, url_for, request, Response, make_response
 import RPi.GPIO as GPIO
 import os.path
 import json
 
-Debug = False
-VerboseConsole = False  # Wether or not print messages to console as well.
+# Custom modules
+import config
+import utils
+
 fileName = os.path.basename(__file__)
-OpenTriggerPassword = "12345678"
 
-# Define which GPIO pins do what.
-# Open and close may be the same or different.
-PINS_BUTTON_OPEN = 11
-PINS_BUTTON_CLOSE = 11
-# Upper magnetic switch *closes* (value 0) when door is open.
-SWITCH_UPPER = 18
-# Upper magnetic switch *closes* (value 0) when door is closed.
-SWITCH_LOWER = 16
-
-
-def logger(msg):
-    logfile = open("/home/pi/GarageWeb/static/log.txt", "a")
-    logfile.write(datetime.now().strftime(
-        "%Y-%m-%d %H:%M:%S [" + fileName + "] - - " + msg + "\n"))
-    logfile.close()
-    if VerboseConsole == True:
-        print(msg)
-
-
-logger('Hello from Web service!')
-logger("Setting up GPIO Pins")
+utils.logger("Hello from Web service!", fileName)
+utils.logger("Setting up GPIO Pins", fileName)
 
 # Use BOARD mode. The pin numbers refer to the **BOARD** connector not the chip.
 # @see https://pinout.xyz/pinout/3v3_power# and the smaller numbers next to the PINs
@@ -41,19 +22,19 @@ GPIO.setwarnings(False)
 
 # Set up the PINs as an input with a pull-up resistor.
 # These will monitor door state.
-GPIO.setup(SWITCH_UPPER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(SWITCH_LOWER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(config.SWITCH_UPPER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(config.SWITCH_LOWER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # Setup OPEN & CLOSE relay control. The output
 # must be set right after in order to the relay not
 # be set with a wrong value (LOW).
-GPIO.setup(PINS_BUTTON_OPEN, GPIO.OUT)
-GPIO.output(PINS_BUTTON_OPEN, GPIO.HIGH)
-if PINS_BUTTON_OPEN != PINS_BUTTON_CLOSE:
+GPIO.setup(config.PINS_BUTTON_OPEN, GPIO.OUT)
+GPIO.output(config.PINS_BUTTON_OPEN, GPIO.HIGH)
+if config.PINS_BUTTON_OPEN != config.PINS_BUTTON_CLOSE:
     GPIO.setup(PINS_BUTTON_CLOSE, GPIO.OUT)
     GPIO.output(PINS_BUTTON_CLOSE, GPIO.HIGH)
 
-logger("Setting up GPIO Pins ... done!")
+utils.logger("Setting up GPIO Pins ... done!", fileName)
 
 # With static_url_path Flask serves all assets under the /static
 # with no further configuration.
@@ -64,30 +45,13 @@ passwd_file = 'garage-password.txt'
 cwd = os.path.dirname(os.path.abspath(__file__))
 file = os.path.join(cwd, passwd_file)
 if os.path.isfile(file):
-    logger("Using passwd from a file: " + file)
+    utils.logger("Using passwd from a file: " + file)
     # Reads all of the content without newlines into a password.
     with open(file) as f:
         OpenTriggerPassword = f.read().splitlines()[0]
 else:
-    logger("Passwd file was not found:" + file + ". Using default passwd.")
-
-
-# Read door status from magnetic switches connected to GPIO
-def door_status():
-    if GPIO.input(SWITCH_LOWER) == GPIO.HIGH and GPIO.input(SWITCH_UPPER) == GPIO.HIGH:
-        if Debug == True:
-            logger("API: Garage is Opening/Closing")
-        return 'in-between'
-    else:
-        if GPIO.input(SWITCH_LOWER) == GPIO.LOW:
-            if Debug == True:
-                logger("Garage is Closed")
-            return 'closed'
-
-        if GPIO.input(SWITCH_UPPER) == GPIO.LOW:
-            if Debug == True:
-                logger("Garage is Open")
-            return 'opened'
+    utils.logger("Passwd file was not found:" + file +
+                 ". Using default passwd.", fileName)
 
 
 # Fetch user real IP even if flask is running behind proxy.
@@ -115,14 +79,14 @@ def add_header(resp):
 @app.route('/', methods=['GET'])
 def index():
     user_ip = user_ip_address()
-    logger("Request from IP " + user_ip)
+    logger("Request from IP " + user_ip, fileName)
     return app.send_static_file('index.html')
 
 
 # REST API, /door endpoint
 @app.route('/api/door', methods=['GET'])
 def api():
-    status = door_status()
+    status = utils.door_status()
 
     response = {
         'status': status if status != None else None,
@@ -139,7 +103,7 @@ def api():
         response['color'] = 'red'
         response['image'] = 'GarageRed.gif'
     else:
-        logger('** ALERT ** Unknown door status response: ' + status)
+        logger('** ALERT ** Unknown door status response: ' + status, fileName)
 
     resp = make_response(json.dumps(response))
     resp.headers['Content-Type'] = 'application/json'
@@ -152,33 +116,35 @@ def api():
 @ app.route('/', methods=['POST'])
 def openTheDoorPlease():
     user_ip = user_ip_address()
-    status = door_status()
+    status = utils.door_status()
     name = request.form['garagecode']
     # the Password that Opens Garage Door (Code if Password is Correct)
     if name == OpenTriggerPassword:
-        logger("Triggered Opening/Closing (IP: " + user_ip + ")")
+        utils.logger(
+            "Triggered Opening/Closing (IP: " + user_ip + ")", fileName)
         # This triggers the Opening/Closing the door.
         if status == 'opened':
-            GPIO.output(PINS_BUTTON_CLOSE, GPIO.LOW)
+            GPIO.output(config.PINS_BUTTON_CLOSE, GPIO.LOW)
             time.sleep(.5)
-            GPIO.output(PINS_BUTTON_CLOSE, GPIO.HIGH)
+            GPIO.output(config.PINS_BUTTON_CLOSE, GPIO.HIGH)
         elif status == 'closed':
-            GPIO.output(PINS_BUTTON_OPEN, GPIO.LOW)
+            GPIO.output(config.PINS_BUTTON_OPEN, GPIO.LOW)
             time.sleep(.5)
-            GPIO.output(PINS_BUTTON_OPEN, GPIO.HIGH)
+            GPIO.output(config.PINS_BUTTON_OPEN, GPIO.HIGH)
         elif status == 'in-between':
-            GPIO.output(PINS_BUTTON_CLOSE, GPIO.LOW)
+            GPIO.output(config.PINS_BUTTON_CLOSE, GPIO.LOW)
             time.sleep(.5)
-            GPIO.output(PINS_BUTTON_CLOSE, GPIO.HIGH)
+            GPIO.output(config.PINS_BUTTON_CLOSE, GPIO.HIGH)
 
-        logger("Triggered Opening/Closing completed.")
+        utils.logger("Triggered Opening/Closing completed.", fileName)
         headers = dict()
         headers['Location'] = url_for('index')
         return Response(
             'Button pressed.', 304, headers)
 
     else:
-        logger("Wrong password provided, request originated from IP " + user_ip)
+        utils.logger(
+            "Wrong password provided, request originated from IP " + user_ip, fileName)
         return Response(
             'Wrong password - no access.', 401)
 
@@ -186,7 +152,7 @@ def openTheDoorPlease():
 @app.route('/log')
 def logfile():
     user_ip = user_ip_address()
-    logger("Access to route /Log from IP " + user_ip)
+    utils.logger("Access to route /Log from IP " + user_ip), fileName
     return app.send_static_file('log.txt')
 
 
