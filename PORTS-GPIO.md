@@ -40,3 +40,4 @@ Controlling PINS their input/output: [](https://www.raspberrypi.org/documentatio
         GPIO.setup(11, GPIO.OUT)
         # Trigger open/close circuit
         GPIO.output(11, GPIO.HIGH)
+        GPIO.output(11, GPIO.LOW)

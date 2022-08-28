@@ -3,139 +3,82 @@ import RPi.GPIO as GPIO
 import time
 import math
 import os.path
-
 from datetime import datetime
-
-Debug = False
-VerboseConsole = False  # Wether or not print messages to console as well.
-fileName = os.path.basename(__file__)
-
-# Define which GPIO pins do what.
-# Open and close may be the same or different.
-PINS_BUTTON_OPEN = 11
-PINS_BUTTON_CLOSE = 11
-# Upper magnetic switch *closes* (value 0) when door is open.
-SWITCH_UPPER = 18
-# Upper magnetic switch *closes* (value 0) when door is closed.
-SWITCH_LOWER = 16
-
-
-def logger(msg):
-    logfile = open("/home/pi/GarageWeb/static/log.txt", "a")
-    logfile.write(datetime.now().strftime(
-        "%Y-%m-%d %H:%M:%S [" + fileName + "] -- " + msg + "\n"))
-    logfile.close()
-    if VerboseConsole == True:
-        print(msg)
-
+import config
+from utils import logger
+import doorControls
 
 print("Control + C to exit Program")
 
-logger('Hello from Door Monitoring!')
-logger("Setting up GPIO Pins")
+fileName = os.path.basename(__file__)
 
-# Use BOARD mode. The pin numbers refer to the **BOARD** connector not the chip.
-# @see https://pinout.xyz/pinout/3v3_power# and the smaller numbers next to the PINs
-# in the graph
-GPIO.setmode(GPIO.BOARD)
-GPIO.setwarnings(False)
 
-# Set up the PINs as an input with a pull-up resistor.
-# These will monitor door state.
-GPIO.setup(SWITCH_UPPER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(SWITCH_LOWER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-# Setup OPEN & CLOSE relay control. The output
-# must be set right after in order to the relay not
-# be set with a wrong value (LOW).
-GPIO.setup(PINS_BUTTON_OPEN, GPIO.OUT)
-GPIO.output(PINS_BUTTON_OPEN, GPIO.HIGH)
-if PINS_BUTTON_OPEN != PINS_BUTTON_CLOSE:
-    GPIO.setup(PINS_BUTTON_CLOSE, GPIO.OUT)
-    GPIO.output(PINS_BUTTON_OPEN, GPIO.HIGH)
-
-logger("Setting up GPIO Pins ... done!")
+logger('Hello from Door Monitoring!', fileName)
+doorControls.setup(fileName)
 
 TimeDoorOpened = datetime.strptime(datetime.strftime(
     datetime.now(), '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')  # Default Time
 
 DoorOpenTimer = 0  # Default start status turns timer off
 DoorOpenTimerMessageSent = 1  # Turn off messages until timer is started
-# Close door automatically after seconds (if left fully opened)
-DoorAutoCloseDelay = 1200
-# Door left open message after seconds (if left fully opened)
-DoorOpenMessageDelay = 900
-
-
-# Read door status from magnetic switches connected to GPIO
-def door_status():
-    if GPIO.input(SWITCH_LOWER) == GPIO.HIGH and GPIO.input(SWITCH_UPPER) == GPIO.HIGH:
-        if Debug == True:
-            logger("API: Garage is Opening/Closing")
-        return 'in-between'
-    else:
-        if GPIO.input(SWITCH_LOWER) == GPIO.LOW:
-            if Debug == True:
-                logger("Garage is Closed")
-            return 'closed'
-
-        if GPIO.input(SWITCH_UPPER) == GPIO.LOW:
-            if Debug == True:
-                logger("Garage is Open")
-            return 'open'
 
 
 # Start the timer if door is open at the boot time.
-if door_status() == 'open':  # Door is Open
-    logger("Door is Open when starging up. Turn Door opened timer initally on.")
-    # Start Door Open Timer
+if doorControls.status() == config.STATE_UP:  # Door is Open
+    logger("Door is Open when starting the door monitoring. Turn the 'Door is opened' timer initally on.", fileName)
     DoorOpenTimer = 1
+else:
+    logger("Door is '" + doorControls.status() +
+           "' when starting the door monitoring. ", fileName)
+    DoorOpenTimer = 0
 
 
 # Read door status from magnetic switches connected to GPIO
 try:
     while 1 >= 0:
-        time.sleep(1)
-        state = door_status()
+        time.sleep(5)
+        state = doorControls.status()
         if DoorOpenTimer == 1:  # Door Open Timer has Started
+            logger("Door timer is ON with delay of " +
+                   str(math.floor(config.DoorOpenMessageDelay/60)) + " minutes. Door is " + state + ".", fileName)
+
             currentTimeDate = datetime.strptime(datetime.strftime(
                 datetime.now(), '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
-            if (currentTimeDate - TimeDoorOpened).seconds > DoorOpenMessageDelay and DoorOpenTimerMessageSent == 0:
+
+            if (currentTimeDate - TimeDoorOpened).seconds > config.DoorOpenMessageDelay and DoorOpenTimerMessageSent == 0:
                 logger("Your Garage Door has been Open for " +
-                       str(math.floor(DoorOpenMessageDelay/60)) + " minutes")
+                       str(math.floor(config.DoorOpenMessageDelay/60)) + " minutes", fileName)
                 DoorOpenTimerMessageSent = 1
 
-            if (currentTimeDate - TimeDoorOpened).seconds > DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
-                logger("Closing Garage Door automatically, since it has been left Open for  " +
-                       str(math.floor(DoorAutoCloseDelay/60)) + " minutes")
-                time.sleep(2)
-                # This triggers the Opening/Closing the door.
-                GPIO.output(PINS_BUTTON_CLOSE, GPIO.LOW)
-                time.sleep(.5)
-                GPIO.output(PINS_BUTTON_CLOSE, GPIO.HIGH)
+            if (currentTimeDate - TimeDoorOpened).seconds > config.DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
+                logger("Closing Garage Door automatically now since it has been left Open for  " +
+                       str(math.floor(config.DoorAutoCloseDelay/60)) + " minutes", fileName)
+                doorControls.close(fileName)
+                DoorOpenTimer = 0
 
         # Door Status is Unknown
-        if state == 'in-between':
-            logger("Door Opening/Closing")
-            while state == 'in-between':
+        if state == config.STATE_BETWEEN:
+            logger("Door Opening/Closing", fileName)
+            while state == config.STATE_BETWEEN:
                 # Door is not closed nor open.
-                time.sleep(.5)
-                state = door_status()
+                time.sleep(5)
+                state = doorControls.status()
             else:
-                if state == 'closed':
-                    logger("Door Closed")
+                if state == config.STATE_DOWN:
+                    logger("Door Closed", fileName)
                     DoorOpenTimer = 0
 
-                elif state == 'opened':
-                    logger("Door Open")
+                elif state == config.STATE_UP:
+                    logger("Door Open", fileName)
                     # Start Door Open Timer
                     TimeDoorOpened = datetime.strptime(datetime.strftime(
                         datetime.now(), '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
-                    logger("Door opened fully: " + str(TimeDoorOpened))
+                    logger("Door opened fully: " +
+                           str(TimeDoorOpened), fileName)
                     DoorOpenTimer = 1
                     DoorOpenTimerMessageSent = 0
 
 
 except KeyboardInterrupt:
-    logger("Monitoring is shut down -- Goodbye!")
+    logger("Monitoring is shut down -- Goodbye!", fileName)
     GPIO.cleanup()

@@ -34,6 +34,8 @@ fi
 
 case "$1" in
   start)
+    echo "Delay garage start to allow Pi with camera module wake up."
+    sleep 5
     $0 start-web
     $0 start-door
     ;;
@@ -41,12 +43,6 @@ case "$1" in
   stop)
     $0 stop-web
     $0 stop-door
-    ;;
-
-  force-reload)
-    $0 stop
-    sleep 1
-    $0 start
     ;;
 
   status)
@@ -69,7 +65,6 @@ case "$1" in
 
   restart)
     $0 stop
-    sleep 1
     $0 start
     ;;
 
