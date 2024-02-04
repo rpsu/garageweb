@@ -1,2 +1,5 @@
-static/log.txt
+garageweb/static/log.txt
 garage-password.txt
+__pycache__/
+garageweb/certs
+.DS_Store

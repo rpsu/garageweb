@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "garageweb"
+version = "0.1.0"
+description = ""
+authors = ["Perttu Ehn"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+Flask = "^3.0.1"
+gpiozero = "^2.0"
+numpy = "^1.26.3"
+imutils = "^0.5.4"
+mock = "^5.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

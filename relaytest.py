@@ -1,14 +1,22 @@
 import RPi.GPIO as GPIO
 import time
 from datetime import datetime
+from gpiozero import LED, Device, output_devices
+from time import sleep
 
-print("Control + C to exit Program")
-
-VerboseConsole = True
-
+led = LED(17)
 # Swithces "door is up" and "door is down".
 SWITCH_UPPER = 18
 SWITCH_LOWER = 16
+
+while True:
+    led.on()
+    sleep(1)
+    led.off()
+    sleep(1)
+print("Control + C to exit Program")
+
+VerboseConsole = True
 
 
 def logger(msg, fileName='??'):

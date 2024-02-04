@@ -1,82 +1,33 @@
-YouTube Video Instructions found here: https://youtu.be/Fcx6wANw9KM
+# GarageWeb
 
-Setting up a Flask web server to control your garage door & display the door status & log usage.
+This home automation tool is built to help garage access management and
+door control. The project is not meant to be secure enough to be run 
+exposed to the internet but should be protected by firewall if you wich
+to be able to access it from outside. Setting up such network is outside 
+the scope of this document.
 
---------------------------------------------------------------------
-Products I used in this video:
---------------------------------------------------------------------
+This project was initially inspired by [Steve's video  "Raspberry Pi Controlled Garage Door & Sensor (complete instructions)" in Youtube](https://youtu.be/Fcx6wANw9KM). However it has been rewritten
+to better support local testing and transportability. **RaspberryPi wiring is the same as in the video except there is a camera module present.**
 
-Raspberry Pi Zero W with case on Amazon: https://amzn.to/34ujK5C
+## Usgae
 
-Raspberry Pi Zero W on Adafruit: https://www.adafruit.com/product/3400
+For local Notifications you need HTTPS certificates (which browswers don't like but allow you to override the warnings). 
 
-4 Channel Relay (to Open Garage Door): https://amzn.to/3b4lHbD
+```sh
+openssl req -x509 -newkey rsa:4096 -nodes -out garageweb/certs/cert.pem -keyout garageweb/certs/key.pem -days 365
+```
 
-Magnetic Reed Switch (You need 2): https://amzn.to/39YG7kU
+This will generate certificates to `garageweb/certs` folder.
 
-Jumper/Breadboard wire 120ct: https://amzn.to/2V3fFlV
+Then you can run this locally:
 
-Hammer Header & Install Kit on Amazon: https://amzn.to/3b5RbxX
+```sh
+poetry run python garageweb/main.py [--debug]
+```
 
-Hammer Headers on Adafruit: https://www.adafruit.com/product/3662
+## Configuration
 
---------------------------------------------------------------------
-Setup Instructions:
---------------------------------------------------------------------
+The configuration is in file `garageweb/config.py`.
 
-1.  --First setup your Raspberry Pi: https://www.youtube.com/watch?v=EeEU_8HG9l0 
-2.  --Lets upgrade the apt-get program: 
-sudo apt-get update
-
-3.  --Next install the Flask Web Server: 
-sudo apt-get install python-flask 
-
-4.  --Install the GIT application so you can download my Github code: 
-sudo apt-get install git 
-
-5.  --Download my Github code: 
-sudo git clone https://github.com/shrocky2/GarageWeb
- 
-6.  --Test out setup and webpage (default port is 5000)
-cd GarageWeb
-     --Test Relay connections
-python relaytest.py
-     --Test Magnetic Reed Switches
-python log.py
-     --Test out Webpage (Rasp_Pi_IP_Address:5000)
-python web.py
-
-
- 7.  --To Setup this code to run automatically on system boot up:
-sudo nano /etc/rc.local
-     --Add the next 2 lines before the last line "exit 0"
-sudo python /home/pi/GarageWeb/web.py &
-sudo python /home/pi/GarageWeb/log.py &
-exit 0
-
-8.  --Change the default password of "12345678"
-sudo nano web.py
-     --find the 2 lines that contain "12345678" change to new password.
-
-9.  --Change default port number (if desired) it'll be the last line of web.py
-
-10.  --Reboot system and let program autostart
-sudo reboot
-
-11.  --Set up Port Forwarding on your Router to allow access when away from home.
-     --Once setup, turn off WiFi on your phone and test. You'll need to know the REAL address of your home router.
-
---------------------------------------------------------------------
-Wiring Diagram:
---------------------------------------------------------------------
-
-<img src="https://github.com/shrocky2/GarageWeb/blob/master/Wiring_Diagram.jpg">
-
---------------------------------------------------------------------
-Additional Videos:
---------------------------------------------------------------------
-Sonoff Garage Door Opener: https://youtu.be/f1JeKHraDf8
-
-How to set up your Raspberry Pi: https://youtu.be/EeEU_8HG9l0
-
-How to set up Port Forwarding on your Router: https://youtu.be/VhVV25zCFrQ
+Override the door open/close password by writing it to a text file called
+`garage-password.txt` in the root of this project. This file should contain only one line of text.

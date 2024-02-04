@@ -2,10 +2,12 @@
 # 0 = fairly quiet but actions and web requests recorded.
 # 1 = increased logging
 # 2 = record even door state every time it is queried
-LogLevel = 1
+LogLevel = 2
 VerboseConsole = False  # Wether or not print messages to console as well.
 OpenTriggerPassword = "12345678"
 
+FlaskDebug=True
+FlaskPort=5001
 # Close door automatically after seconds (if left fully opened)
 # DoorAutoCloseDelay = 1200
 DoorAutoCloseDelay = 480
@@ -24,4 +26,4 @@ SWITCH_LOWER = 16
 # Door state constants.
 STATE_UP = 'opened'
 STATE_DOWN = 'down'
-STATE_BETWEEN = 'partially opened'
+STATE_BETWEEN = 'between'
