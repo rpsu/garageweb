@@ -1,7 +1,7 @@
 import json
 import os
 import platform
-from flask import Flask, Response, request, make_response, url_for
+from flask import Flask, Response, redirect, request, make_response
 from multiprocessing import Process
 from utils import logger, user_ip_address
 from config import FlaskDebug, FlaskPort
@@ -9,7 +9,6 @@ from door import closeTheDoor, getTheDoorStatus, openTheDoor
 from doorMonitor import run
 import config
 import argparse
-from pathlib import Path
 import atexit
 
 # Allow overwriting of some of the config values from the command line
@@ -82,7 +81,7 @@ def log():
   except FileNotFoundError:
     return "The log file does not exist."
 
-@ app.route('/', methods=['POST'])
+@ app.route('/api/toggle', methods=['POST'])
 def openTheDoorPlease():
     user_ip = user_ip_address(request)
     name = request.form['garagecode']
@@ -104,10 +103,7 @@ def openTheDoorPlease():
             closeTheDoor(fileName)
 
         logger("Door action completed.", fileName)
-        headers = dict()
-        headers['Location'] = url_for('index')
-        return Response(
-            'Button pressed.', 304, headers)
+        return redirect('/')
 
 def run_door_monitor():
   run()  # Start the door monitor
