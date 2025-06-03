@@ -1,3 +1,7 @@
+
+# DO NOT move the door, but just log stuff.
+DRY_RUN=False
+
 # Log levels:
 # 0 = fairly quiet but actions and web requests recorded.
 # 1 = increased logging
