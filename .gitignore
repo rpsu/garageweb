@@ -1,2 +1,7 @@
 static/log.txt
 garage-password.txt
+*.pyc
+webstreaming.py
+cam/
+motion_detection/
+env/
