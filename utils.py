@@ -25,3 +25,18 @@ def user_ip_address(request):
     else:
         user_ip = request.remote_addr  # For local development
     return user_ip
+
+# Get current password from a file.
+def get_door_pwd():
+    passwd_file = 'garage-password.txt'
+    cwd = os.path.dirname(os.path.abspath(__file__))
+    file = os.path.join(cwd, passwd_file)
+    if os.path.isfile(file):
+        logger("Using passwd from a file: " + file, fileName)
+        # Reads all of the content without newlines into a password.
+        with open(file) as f:
+            return f.read().splitlines()[0]
+    else:
+        logger("Passwd file was not found:" + file +
+            ". Using default passwd.", fileName)
+        return config.DoorPassword
