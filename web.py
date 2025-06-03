@@ -1,39 +1,18 @@
 from fileinput import filename
-from os import stat
-import time
-from datetime import datetime
+import os.path, requests, time, jsonify
 from flask import Flask, url_for, request, Response, make_response
-import RPi.GPIO as GPIO
-import os.path
-import json
+
 import config
-from utils import logger, user_ip_address
-import doorControls
+from utils import logger, user_ip_address, get_door_pwd
 
 fileName = os.path.basename(__file__)
+SERVICE_REST_API = "http://127.0.0.1:8088"
 
-
-logger('Hello from Web service!', fileName)
-
-doorControls.setup(fileName)
+logger('Hello from doorWebUI. Serving HTML!', fileName)
 
 # With static_url_path Flask serves all assets under the /static
 # with no further configuration.
 app = Flask(__name__, static_url_path='/static')
-
-
-passwd_file = 'garage-password.txt'
-cwd = os.path.dirname(os.path.abspath(__file__))
-file = os.path.join(cwd, passwd_file)
-if os.path.isfile(file):
-    logger("Using passwd from a file: " + file, fileName)
-    # Reads all of the content without newlines into a password.
-    with open(file) as f:
-        config.OpenTriggerPassword = f.read().splitlines()[0]
-else:
-    logger("Passwd file was not found:" + file +
-           ". Using default passwd.", fileName)
-
 
 # Prevent all responses from being cached.
 @app.after_request
@@ -55,61 +34,63 @@ def index():
 
 # REST API, /door endpoint
 @app.route('/api/door', methods=['GET'])
-def api():
-    status = doorControls.status()
+def restApiDoor():
+    try:
+        status = requests.get(f"{SERVICE_REST_API}/status", timeout=2)
 
-    response = {
-        'status': status if status != None else None,
-        'color': None,
-        'image': None,
-    }
-    if status == config.STATE_BETWEEN:
-        response['color'] = 'orange'
-        response['image'] = 'GarageQuestion.gif'
-    elif status == config.STATE_DOWN:
-        response['color'] = 'green'
-        response['image'] = 'GarageGreen.gif'
-    elif status == config.STATE_UP:
-        response['color'] = 'red'
-        response['image'] = 'GarageRed.gif'
-    else:
-        logger('** ALERT ** Unknown door status response: ' + status, fileName)
+        response = {
+            'status': status if status != None else None,
+            'color': None,
+            'image': None,
+        }
 
-    resp = make_response(json.dumps(response))
-    resp.headers['Content-Type'] = 'application/json'
+        if status == config.STATE_BETWEEN:
+            response['color'] = 'orange'
+            response['image'] = 'GarageQuestion.gif'
+        elif status == config.STATE_DOWN:
+            response['color'] = 'green'
+            response['image'] = 'GarageGreen.gif'
+        elif status == config.STATE_UP:
+            response['color'] = 'red'
+            response['image'] = 'GarageRed.gif'
+        else:
+            logger('** ALERT ** Unknown door status response: ' + status, fileName)
 
-    return resp
+        resp = make_response(json.dumps(response))
+        resp.headers['Content-Type'] = 'application/json'
+
+        return resp
+
+    except Exception:
+        resp = make_response("")
+
+
+        return False
+
 
 # Main route for POST requests (ie. door open/close requests)
 
 
-@ app.route('/', methods=['POST'])
+@ app.route('/api/toggle', methods=['POST'])
 def openTheDoorPlease():
-    user_ip = user_ip_address(request)
-    status = doorControls.status()
-    name = request.form['garagecode']
     # the Password that Opens Garage Door (Code if Password is Correct)
-    if name != config.OpenTriggerPassword:
+    user_ip = user_ip_address(request)
+    name = request.form['garagecode']
+    if name != get_door_pwd():
         logger("Wrong password provided, request originated from IP " +
                user_ip, fileName)
         return Response(
             'Wrong password - no access.', 401)
 
-    else:
-        logger("Triggered Opening/Closing (IP: " + user_ip + ")", fileName)
-        # This triggers the Opening/Closing the door.
-        if status == config.STATE_UP:
-            doorControls.close(fileName)
-        elif status == config.STATE_DOWN:
-            doorControls.open(fileName)
-        elif status == config.STATE_BETWEEN:
-            doorControls.close(fileName)
+    logger("Triggered Opening/Closing (IP: " + user_ip + ")", fileName)
+    status = requests.get(f"{SERVICE_REST_API}/toggle", timeout=2)
 
-        logger("Door action completed.", fileName)
-        headers = dict()
-        headers['Location'] = url_for('index')
-        return Response(
-            'Button pressed.', 304, headers)
+
+    logger("Door action completed. The door may still be closing or opening.", fileName)
+    headers = dict()
+    headers['Location'] = url_for('index')
+    return Response(
+        'Button pressed.', 304, headers)
 
 
 @ app.route('/log')
