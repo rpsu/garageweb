@@ -4,7 +4,7 @@
 # 2 = record even door state every time it is queried
 LogLevel = 1
 VerboseConsole = False  # Wether or not print messages to console as well.
-OpenTriggerPassword = "12345678"
+DoorPassword = "12345678"
 
 # Close door automatically after seconds (if left fully opened)
 # DoorAutoCloseDelay = 1200
@@ -22,6 +22,6 @@ SWITCH_UPPER = 18
 SWITCH_LOWER = 16
 
 # Door state constants.
-STATE_UP = 'opened'
+STATE_UP = 'up'
 STATE_DOWN = 'down'
-STATE_BETWEEN = 'partially opened'
+STATE_BETWEEN = 'between'
