@@ -23,20 +23,21 @@ DoorOpenTimer = 0  # Default start status turns timer off
 DoorOpenTimerMessageSent = 1  # Turn off messages until timer is started
 
 
-# Start the timer if door is open at the boot time.
-if doorControls.status() == config.STATE_UP:  # Door is Open
-    logger("Door is Open when starting the door monitoring. Turn the 'Door is opened' timer initally on.", fileName)
-    DoorOpenTimer = 1
-else:
-    logger("Door is '" + doorControls.status() +
-           "' when starting the door monitoring. ", fileName)
-    DoorOpenTimer = 0
+
 
 
 # Read door status from magnetic switches connected to GPIO
 def doorMonitor():
     while True:
         with lock:
+            # Start the timer if door is open at the boot time.
+            if doorControls.status() == config.STATE_UP:  # Door is Open
+                logger("Door is Open when starting the door monitoring. Turn the 'Door is opened' timer initally on.", fileName)
+                DoorOpenTimer = 1
+            else:
+                logger("Door is '" + doorControls.status() +
+                    "' when starting the door monitoring. ", fileName)
+                DoorOpenTimer = 0
             time.sleep(5)
             state = doorControls.status()
             if DoorOpenTimer == 1:  # Door Open Timer has Started
