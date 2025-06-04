@@ -1,10 +1,9 @@
-from datetime import datetime
-import os, math, time, signal, threading, json
-from flask import Flask, request
+import os, math, time, threading, json
+from flask import Flask
 
 
 import config
-from utils import logger
+from utils import logger, timeNow
 import doorControls
 
 fileName = os.path.basename(__file__)
@@ -18,14 +17,13 @@ app = Flask(__name__)
 
 # Read door status from magnetic switches connected to GPIO
 def doorMonitor():
-    TimeDoorOpened = datetime.strptime(datetime.strftime(
-        datetime.now(), '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')  # Default Time
 
     DoorOpenTimer = 0  # Default start status turns timer off
     DoorOpenTimerMessageSent = 1  # Turn off messages until timer is started
 
     while True:
         with lock:
+            TimeDoorOpened = timeNow()
             # Start the timer if door is open at the boot time.
             if doorControls.status() == config.STATE_UP:  # Door is Open
                 logger("Door is Open and timer is running.", fileName)
@@ -38,8 +36,7 @@ def doorMonitor():
                 logger("Door timer is ON with delay of " +
                     str(math.floor(config.DoorOpenMessageDelay/60)) + " minutes. Door is " + doorControls.status() + ".", fileName)
 
-                currentTimeDate = datetime.strptime(datetime.strftime(
-                    datetime.now(), '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
+                currentTimeDate = timeNow()
 
                 if (currentTimeDate - TimeDoorOpened).seconds > config.DoorOpenMessageDelay and DoorOpenTimerMessageSent == 0:
                     logger("Your Garage Door has been Open for " +
@@ -65,8 +62,7 @@ def doorMonitor():
 
                     elif doorControls.status() == config.STATE_UP:
                         # Start Door Open Timer
-                        TimeDoorOpened = datetime.strptime(datetime.strftime(
-                            datetime.now(), '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
+                        TimeDoorOpened = timeNow()
                         logger("Door opened fully: " +
                             str(TimeDoorOpened), fileName)
                         DoorOpenTimer = 1

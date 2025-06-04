@@ -1,7 +1,6 @@
 from datetime import datetime
 import time
-import config
-import os.path
+import config, os.path
 
 fileName = os.path.basename(__file__)
 
@@ -39,3 +38,7 @@ def get_door_pwd():
         logger("Passwd file was not found:" + file +
             ". Using default passwd.", fileName)
         return config.DoorPassword
+
+def timeNow():
+    return  datetime.strptime(datetime.strftime(
+        datetime.now(), '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')

@@ -61,7 +61,8 @@ def restApiDoor():
         return resp
 
     except Exception:
-        return False
+        logger("API response threw an Exception", fileName)
+        return 'Failed'
 
 
 # Main route for POST requests (ie. door open/close requests)
