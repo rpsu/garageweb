@@ -10,8 +10,15 @@ GPIO_SETUP = False
 
 # Shutdown and cleanup, then register the function right below.
 def shutdown(*args):
+    logger("GPIO shutdown() called with: " + ', '.join(args), fileName)
     with lock:
-        GPIO.cleanup()
+        if GPIO_SETUP:
+            logger("Cleaning up GPIO.", fileName)
+            GPIO.cleanup()
+            logger("GPIO cleaned up.", fileName)
+            GPIO_SETUP=False
+        else:
+            logger("GPIO cleaning not done since GPIO_SETUP is false.", fileName)
 
 atexit.register(shutdown)
 signal.signal(signal.SIGINT, lambda s, f: exit(0))
