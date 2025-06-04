@@ -72,7 +72,9 @@ def restApiDoor():
 
     except Exception as e:
         logger("API response threw an Exception " + str(e), fileName)
-        return 'Failed'
+        result = {"error": "status retrieval error", "code": 500}
+        result['detail'] = str(e)
+        return json.dumps(result), 500
 
 
 # Main route for POST requests (ie. door open/close requests)

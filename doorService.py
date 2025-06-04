@@ -94,7 +94,11 @@ def toggle():
 
 @app.route("/status", methods=["GET"])
 def status():
-    return json.dumps({"status": doorControls.status()})
+    try:
+        status = doorControls.status()
+        return json.dumps({"status": status})
+    finally:
+        return json.dumps({"error": "status not received", "code": 501})
 
 if __name__ == "__main__":
     try:
