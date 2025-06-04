@@ -10,6 +10,7 @@ GPIO_SETUP = False
 
 # Shutdown and cleanup, then register the function right below.
 def shutdown(*args):
+    global GPIO_SETUP
     logger("GPIO shutdown() called with: " + ', '.join(args), fileName)
     with lock:
         if GPIO_SETUP:
