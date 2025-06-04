@@ -1,5 +1,4 @@
-from fileinput import filename
-import os.path, requests, time, jsonify
+import os.path, requests, json
 from flask import Flask, url_for, request, Response, make_response
 
 import config
@@ -35,14 +34,14 @@ def index():
 # REST API, /door endpoint
 @app.route('/api/door', methods=['GET'])
 def restApiDoor():
+    response = {
+        'status': None,
+        'color': None,
+        'image': None,
+    }
     try:
-        status = requests.get(f"{SERVICE_REST_API}/status", timeout=2)
-
-        response = {
-            'status': status if status != None else None,
-            'color': None,
-            'image': None,
-        }
+        status = requests.get("%s/status" % SERVICE_REST_API, timeout=2)
+        response['status' ] = status if status != None else None
 
         if status == config.STATE_BETWEEN:
             response['color'] = 'orange'
@@ -55,16 +54,13 @@ def restApiDoor():
             response['image'] = 'GarageRed.gif'
         else:
             logger('** ALERT ** Unknown door status response: ' + status, fileName)
-
+        logger("API response is " + json.dumps(response), fileName)
         resp = make_response(json.dumps(response))
         resp.headers['Content-Type'] = 'application/json'
 
         return resp
 
     except Exception:
-        resp = make_response("")
-
-
         return False
 
 
@@ -83,7 +79,7 @@ def openTheDoorPlease():
             'Wrong password - no access.', 401)
 
     logger("Triggered Opening/Closing (IP: " + user_ip + ")", fileName)
-    status = requests.get(f"{SERVICE_REST_API}/toggle", timeout=2)
+    status = requests.get("%s/toggle" % SERVICE_REST_API, timeout=2)
 
 
     logger("Door action completed. The door may still be closing or opening.", fileName)
