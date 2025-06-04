@@ -80,23 +80,21 @@ def doorMonitor():
 
 @app.route("/toggle", methods=["POST"])
 def toggle():
-    with lock:
-        # This triggers the Opening/Closing the door.
-        status = doorControls.status()
-        if status == config.STATE_UP:
-            doorControls.close(fileName)
-        elif status == config.STATE_DOWN:
-            doorControls.open(fileName)
-        elif status == config.STATE_BETWEEN:
-            doorControls.close(fileName)
-
-        return json.dumps({"status": doorControls.status()})
+    # This triggers the Opening/Closing the door.
+    status = doorControls.status()
+    if status == config.STATE_UP:
+        doorControls.close(fileName)
+    elif status == config.STATE_DOWN:
+        doorControls.open(fileName)
+    elif status == config.STATE_BETWEEN:
+        doorControls.close(fileName)
+    time.sleep(0.5)
+    return json.dumps({"status": doorControls.status()})
 
 
 @app.route("/status", methods=["GET"])
 def status():
-    with lock:
-        return json.dumps({"status": doorControls.status()})
+    return json.dumps({"status": doorControls.status()})
 
 if __name__ == "__main__":
     try:
