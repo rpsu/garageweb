@@ -21,6 +21,9 @@ logging.basicConfig(
     datefmt='%a, %d %b %Y %H:%M:%S',
     encoding='utf-8'
 )
+if config.DEBUGGING:
+    logging.basicConfig['level'] = logging.DEBUG
+
 
 # Read door status from magnetic switches connected to GPIO
 def doorMonitor():
@@ -101,6 +104,6 @@ if __name__ == "__main__":
         thread = threading.Thread(target=doorMonitor)
         thread.daemon = True  # Make this thread a daemon
         thread.start()
-        app.run(host="127.0.0.1", port=8088, debug=False)
+        app.run(host="127.0.0.1", port=8088, debug={config.DEBUGGING})
     finally:
         doorControls.shutdown()

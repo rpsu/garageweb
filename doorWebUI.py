@@ -20,6 +20,8 @@ logging.basicConfig(
     datefmt='%a, %d %b %Y %H:%M:%S',
     encoding='utf-8'
 )
+if config.DEBUGGING:
+    logging.basicConfig['level'] = logging.DEBUG
 
 # Prevent all responses from being cached.
 @app.after_request
@@ -106,5 +108,4 @@ def logfile():
 
 
 if __name__ == '__main__':
-    #     app.run(debug=True, host='0.0.0.0', port=5000)
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug={config.DEBUGGING})
