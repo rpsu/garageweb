@@ -22,7 +22,7 @@ logging.basicConfig(
     encoding='utf-8'
 )
 if config.DEBUGGING:
-    logging.basicConfig['level'] = logging.DEBUG
+    logging.basicConfig(level=logging.DEBUG)
 
 
 # Read door status from magnetic switches connected to GPIO

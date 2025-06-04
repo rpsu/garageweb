@@ -21,7 +21,7 @@ logging.basicConfig(
     encoding='utf-8'
 )
 if config.DEBUGGING:
-    logging.basicConfig['level'] = logging.DEBUG
+    logging.basicConfig(level=logging.DEBUG)
 
 # Prevent all responses from being cached.
 @app.after_request
