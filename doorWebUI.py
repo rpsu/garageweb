@@ -53,7 +53,8 @@ def restApiDoor():
         'image': None,
     }
     try:
-        status = requests.get("%s/status" % SERVICE_REST_API, timeout=2)
+        status = doorControls.status()
+
         response['status' ] = status if status != None else None
 
         if status == config.STATE_BETWEEN:
@@ -95,9 +96,16 @@ def openTheDoorPlease():
             'Wrong password - no access.', 401)
 
     logger("Triggered Opening/Closing (IP: " + user_ip + ")", fileName)
-    status = requests.get("%s/toggle" % SERVICE_REST_API, timeout=2)
 
-
+    # This triggers the Opening/Closing the door.
+    status = doorControls.status()
+    if status == config.STATE_UP:
+        doorControls.close(fileName)
+    elif status == config.STATE_DOWN:
+        doorControls.open(fileName)
+    elif status == config.STATE_BETWEEN:
+        doorControls.close(fileName)
+    time.sleep(0.5)
     logger("Door action completed. The door may still be closing or opening.", fileName)
     headers = dict()
     headers['Location'] = url_for('index')
