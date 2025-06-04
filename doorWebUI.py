@@ -1,8 +1,11 @@
-import os.path, requests, json, logging
+import os.path, requests, json, logging, time, datetime, threading, math
 from flask import Flask, url_for, request, Response, make_response
 
 import config
 from utils import logger, user_ip_address, get_door_pwd
+import doorControls
+
+lock = threading.Lock()
 
 fileName = os.path.basename(__file__)
 SERVICE_REST_API = "http://127.0.0.1:8088"
@@ -108,6 +111,64 @@ def logfile():
            user_ip_address(request), fileName)
     return app.send_static_file('log.txt')
 
+# Read door status from magnetic switches connected to GPIO
+def doorMonitor():
+
+    DoorOpenTimer = 0  # Default start status turns timer off
+    DoorOpenTimerMessageSent = 1  # Turn off messages until timer is started
+
+    while True:
+        with lock:
+            TimeDoorOpened = datetime.datetime.now()
+            # Start the timer if door is open at the boot time.
+            if doorControls.status() == config.STATE_UP:  # Door is Open
+                logger("Door is Open and timer is running (started " + str(TimeDoorOpened) + ".", fileName)
+                DoorOpenTimer = 1
+            else:
+                DoorOpenTimer = 0
+            time.sleep(5)
+             # Door Open Timer has Started
+            if DoorOpenTimer == 1:
+                logger("Door timer is ON with delay of " +
+                    str(math.floor(config.DoorOpenMessageDelay/60)) + " minutes. Door is " + doorControls.status() + ".", fileName)
+
+                currentTimeDate = datetime.datetime.now()
+
+                if (currentTimeDate - TimeDoorOpened).total_seconds() > config.DoorOpenMessageDelay and DoorOpenTimerMessageSent == 0:
+                    logger("Your Garage Door has been Open for " +
+                        str(math.floor(config.DoorOpenMessageDelay/60)) + " minutes", fileName)
+                    DoorOpenTimerMessageSent = 1
+
+                if (currentTimeDate - TimeDoorOpened).total_seconds() > config.DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
+                    logger("Closing Garage Door automatically now since it has been left Open for  " +
+                        str(math.floor(config.DoorAutoCloseDelay/60)) + " minutes", fileName)
+                    doorControls.close(fileName)
+                    DoorOpenTimer = 0
+
+            # Door Status is Unknown
+            if doorControls.status() == config.STATE_BETWEEN:
+                logger("Door Opening/Closing", fileName)
+                while doorControls.status() == config.STATE_BETWEEN:
+                    time.sleep(10)
+
+                else:
+                    if doorControls.status() == config.STATE_DOWN:
+                        logger("Door Closed", fileName)
+                        DoorOpenTimer = 0
+
+                    elif doorControls.status() == config.STATE_UP:
+                        # Start Door Open Timer
+                        TimeDoorOpened = datetime.datetime.now()
+                        logger("Door opened fully: " +
+                            str(TimeDoorOpened), fileName)
+                        DoorOpenTimer = 1
+                        DoorOpenTimerMessageSent = 0
+
 
 if __name__ == '__main__':
+    doorControls.setup(fileName)
+    thread = threading.Thread(target=doorMonitor)
+    thread.daemon = True  # Make this thread a daemon
+    thread.start()
+
     app.run(host='0.0.0.0', port=5000, debug={config.DEBUGGING})

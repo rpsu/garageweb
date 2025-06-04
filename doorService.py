@@ -25,58 +25,6 @@ if config.DEBUGGING:
     logging.basicConfig(level=logging.DEBUG)
 
 
-# Read door status from magnetic switches connected to GPIO
-def doorMonitor():
-
-    DoorOpenTimer = 0  # Default start status turns timer off
-    DoorOpenTimerMessageSent = 1  # Turn off messages until timer is started
-
-    while True:
-        with lock:
-            TimeDoorOpened = datetime.datetime.now()
-            # Start the timer if door is open at the boot time.
-            if doorControls.status() == config.STATE_UP:  # Door is Open
-                logger("Door is Open and timer is running.", fileName)
-                DoorOpenTimer = 1
-            else:
-                DoorOpenTimer = 0
-            time.sleep(5)
-             # Door Open Timer has Started
-            if DoorOpenTimer == 1:
-                logger("Door timer is ON with delay of " +
-                    str(math.floor(config.DoorOpenMessageDelay/60)) + " minutes. Door is " + doorControls.status() + ".", fileName)
-
-                currentTimeDate = datetime.datetime.now()
-
-                if (currentTimeDate - TimeDoorOpened).total_seconds() > config.DoorOpenMessageDelay and DoorOpenTimerMessageSent == 0:
-                    logger("Your Garage Door has been Open for " +
-                        str(math.floor(config.DoorOpenMessageDelay/60)) + " minutes", fileName)
-                    DoorOpenTimerMessageSent = 1
-
-                if (currentTimeDate - TimeDoorOpened).total_seconds() > config.DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
-                    logger("Closing Garage Door automatically now since it has been left Open for  " +
-                        str(math.floor(config.DoorAutoCloseDelay/60)) + " minutes", fileName)
-                    doorControls.close(fileName)
-                    DoorOpenTimer = 0
-
-            # Door Status is Unknown
-            if doorControls.status() == config.STATE_BETWEEN:
-                logger("Door Opening/Closing", fileName)
-                while doorControls.status() == config.STATE_BETWEEN:
-                    time.sleep(10)
-
-                else:
-                    if doorControls.status() == config.STATE_DOWN:
-                        logger("Door Closed", fileName)
-                        DoorOpenTimer = 0
-
-                    elif doorControls.status() == config.STATE_UP:
-                        # Start Door Open Timer
-                        TimeDoorOpened = datetime.datetime.now()
-                        logger("Door opened fully: " +
-                            str(TimeDoorOpened), fileName)
-                        DoorOpenTimer = 1
-                        DoorOpenTimerMessageSent = 0
 
 @app.route("/toggle", methods=["POST"])
 def toggle():
