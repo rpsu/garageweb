@@ -33,17 +33,6 @@ if [ "$USER_ID" -ne "0" ]; then
 fi
 
 case "$1" in
-start)
-  echo "Delay garage start to allow Pi with camera module wake up."
-  sleep 5
-  $0 start-web
-  $0 start-door
-  ;;
-
-stop)
-  $0 stop-web
-  $0 stop-door
-  ;;
 
 status)
   F=doorWebUI.py
@@ -68,20 +57,9 @@ restart)
   $0 start
   ;;
 
-start-door)
-  echo "Starting Door monitor"
-  F=doorService.py
-  if [ -f /var/run/garage.${F}.pid ]; then
-    echo "${F} is already running (pid file exists)."
-    exit 1
-  fi
-  python /home/pi/GarageWeb/${F} &
-  PID=$!
-  echo $PID ${F} started
-  echo $PID >/var/run/garage.${F}.pid
-  ;;
-
-start-web)
+start)
+  echo "Delay garage start to allow Pi with camera module wake up."
+  sleep 5
   echo "Starting Web monitor"
   F=doorWebUI.py
   if [ -f /var/run/garage.${F}.pid ]; then
@@ -94,18 +72,7 @@ start-web)
   echo $PID >/var/run/garage.${F}.pid
   ;;
 
-stop-door)
-  echo "Stopping Door monitor"
-  F=doorService.py
-  if [ -f /var/run/garage.${F}.pid ]; then
-    PID=$(cat /var/run/garage.${F}.pid)
-    echo Kill ${F} process "$PID"
-    pkill -F /var/run/garage.${F}.pid || echo Killing PID "$PID" failed.
-    rm /var/run/garage.${F}.pid || echo Removing PID "$PID" failed.
-  fi
-  ;;
-
-stop-web)
+stop)
   echo "Stopping Garage Web"
   F=doorWebUI.py
   if [ -f /var/run/garage.${F}.pid ]; then
