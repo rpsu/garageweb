@@ -26,11 +26,13 @@ signal.signal(signal.SIGTERM, lambda s, f: exit(0))
 
 def setup(initializer):
     global GPIO_SETUP
+
+    logger("Setting up GPIO Pins. Init requested from " + initializer, fileName)
+
     if GPIO_SETUP:  # Check if already set up
         logger("Init already done, skipping from " + initializer, fileName)
         return True
 
-    logger("Setting up GPIO Pins. Init requested from " + initializer, fileName)
     # Use BOARD mode. The pin numbers refer to the **BOARD** connector not the chip.
     # @see https://pinout.xyz/pinout/3v3_power# and the smaller numbers next to the PINs
     # in the graph
