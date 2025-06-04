@@ -16,7 +16,7 @@ DoorAutoCloseDelay = 480
 # Door left open message after seconds (if left fully opened)
 DoorOpenMessageDelay = 300
 
-# Define which GPIO pins do what.
+# Define which GPIO pins do what. Use GPIO.BOARD mode.
 # Open and close may be the same or different.
 PINS_BUTTON_OPEN = 11
 PINS_BUTTON_CLOSE = 11

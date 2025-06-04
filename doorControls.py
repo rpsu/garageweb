@@ -5,7 +5,8 @@ from utils import logger
 
 fileName = os.path.basename(__file__)
 lock = threading.Lock()
-GPIO_SETUP = None # Initialize as None
+
+GPIO_SETUP = False
 
 # Shutdown and cleanup, then register the function right below.
 def shutdown(*args):
