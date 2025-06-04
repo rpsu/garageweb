@@ -1,4 +1,4 @@
-import os.path, requests, json
+import os.path, requests, json, logging
 from flask import Flask, url_for, request, Response, make_response
 
 import config
@@ -12,6 +12,14 @@ logger('Hello from doorWebUI. Serving HTML!', fileName)
 # With static_url_path Flask serves all assets under the /static
 # with no further configuration.
 app = Flask(__name__, static_url_path='/static')
+
+# Configure Flask logging mainly for the UTF-8 filesystem.
+logging.basicConfig(
+    format='%(asctime)s %(levelname)s [%(module)s] %(message)s',
+    level=logging.INFO,
+    datefmt='%a, %d %b %Y %H:%M:%S',
+    encoding='utf-8'
+)
 
 # Prevent all responses from being cached.
 @app.after_request
@@ -60,8 +68,8 @@ def restApiDoor():
 
         return resp
 
-    except Exception:
-        logger("API response threw an Exception", fileName)
+    except Exception as e:
+        logger("API response threw an Exception " + str(e), fileName)
         return 'Failed'
 
 

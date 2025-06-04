@@ -1,9 +1,8 @@
-import os, math, time, threading, json
+import os, math, time, threading, json, datetime, logging
 from flask import Flask
 
-
 import config
-from utils import logger, timeNow
+from utils import logger
 import doorControls
 
 fileName = os.path.basename(__file__)
@@ -15,6 +14,14 @@ logger('Hello from Door servide!', fileName)
 
 app = Flask(__name__)
 
+# Configure Flask logging mainly for the UTF-8 filesystem.
+logging.basicConfig(
+    format='%(asctime)s %(levelname)s [%(module)s] %(message)s',
+    level=logging.INFO,
+    datefmt='%a, %d %b %Y %H:%M:%S',
+    encoding='utf-8'
+)
+
 # Read door status from magnetic switches connected to GPIO
 def doorMonitor():
 
@@ -23,7 +30,7 @@ def doorMonitor():
 
     while True:
         with lock:
-            TimeDoorOpened = timeNow()
+            TimeDoorOpened = datetime.datetime.now()
             # Start the timer if door is open at the boot time.
             if doorControls.status() == config.STATE_UP:  # Door is Open
                 logger("Door is Open and timer is running.", fileName)
@@ -36,14 +43,14 @@ def doorMonitor():
                 logger("Door timer is ON with delay of " +
                     str(math.floor(config.DoorOpenMessageDelay/60)) + " minutes. Door is " + doorControls.status() + ".", fileName)
 
-                currentTimeDate = timeNow()
+                currentTimeDate = datetime.datetime.now()
 
-                if (currentTimeDate - TimeDoorOpened).seconds > config.DoorOpenMessageDelay and DoorOpenTimerMessageSent == 0:
+                if (currentTimeDate - TimeDoorOpened).total_seconds() > config.DoorOpenMessageDelay and DoorOpenTimerMessageSent == 0:
                     logger("Your Garage Door has been Open for " +
                         str(math.floor(config.DoorOpenMessageDelay/60)) + " minutes", fileName)
                     DoorOpenTimerMessageSent = 1
 
-                if (currentTimeDate - TimeDoorOpened).seconds > config.DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
+                if (currentTimeDate - TimeDoorOpened).total_seconds() > config.DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
                     logger("Closing Garage Door automatically now since it has been left Open for  " +
                         str(math.floor(config.DoorAutoCloseDelay/60)) + " minutes", fileName)
                     doorControls.close(fileName)
@@ -62,7 +69,7 @@ def doorMonitor():
 
                     elif doorControls.status() == config.STATE_UP:
                         # Start Door Open Timer
-                        TimeDoorOpened = timeNow()
+                        TimeDoorOpened = datetime.datetime.now()
                         logger("Door opened fully: " +
                             str(TimeDoorOpened), fileName)
                         DoorOpenTimer = 1

@@ -1,17 +1,19 @@
+import config, os.path, threading, datetime
 from datetime import datetime
-import time
-import config, os.path
+
+lock = threading.Lock()
 
 fileName = os.path.basename(__file__)
 
 
 def logger(msg, fileName='??'):
-    logfile = open("/home/pi/GarageWeb/static/log.txt", "a")
-    logfile.write(datetime.now().strftime(
-        "%Y-%m-%d %H:%M:%S [" + fileName + "] - - " + msg + "\n"))
-    logfile.close()
-    if config.VerboseConsole == True:
-        print(msg)
+    with lock:
+        logfile = open("/home/pi/GarageWeb/static/log.txt", "a")
+        logfile.write(datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S [" + fileName + "] - - " + msg + "\n"))
+        logfile.close()
+        if config.VerboseConsole == True:
+            print(msg)
 
 
 # Fetch user real IP even if flask is running behind proxy.
@@ -38,7 +40,3 @@ def get_door_pwd():
         logger("Passwd file was not found:" + file +
             ". Using default passwd.", fileName)
         return config.DoorPassword
-
-def timeNow():
-    return  datetime.strptime(datetime.strftime(
-        datetime.now(), '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
