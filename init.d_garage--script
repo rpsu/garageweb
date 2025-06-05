@@ -36,6 +36,8 @@ case "$1" in
 start)
   echo "5 sec delay garage WEB start to allow Pi with camera module wake up."
   sleep 1
+  $0 start-logger
+  sleep 2
   $0 start-controller
   sleep 2
   $0 start-automator
@@ -45,15 +47,22 @@ start)
 
 stop)
   $0 stop-web
-  sleep 2
   $0 stop-automator
-  sleep 2
-  $0 stop-contoller
+  $0 stop-controller
+  $0 stop-logger
   ;;
 
 status)
+  F=loggerService.py
+  PID=$(ps -ef | grep ${F} | grep python | awk {'print $2'} | xargs)
+  if [ -f /var/run/garage.${F}.pid ] && [ ! -z "$PID" ]; then
+    echo "${F} is already running (pid file exists, prcesses running: $PID )."
+  else
+    echo "${F} is not running."
+  fi
+
   F=doorController.py
-  PID=$(ps -ef | grep door.py | grep python | awk {'print $2'} | xargs)
+  PID=$(ps -ef | grep ${F} | grep python | awk {'print $2'} | xargs)
   if [ -f /var/run/garage.${F}.pid ] && [ ! -z "$PID" ]; then
     echo "${F} is already running (pid file exists, prcesses running: $PID )."
   else
@@ -61,7 +70,7 @@ status)
   fi
 
   F=doorAutomator.py
-  PID=$(ps -ef | grep door.py | grep python | awk {'print $2'} | xargs)
+  PID=$(ps -ef | grep ${F} | grep python | awk {'print $2'} | xargs)
   if [ -f /var/run/garage.${F}.pid ] && [ ! -z "$PID" ]; then
     echo "${F} is already running (pid file exists, prcesses running: $PID )."
   else
@@ -69,7 +78,7 @@ status)
   fi
 
   F=doorWeb.py
-  PID=$(ps -ef | grep web.py | grep python | awk {'print $2'} | xargs)
+  PID=$(ps -ef | grep ${F} | grep python | awk {'print $2'} | xargs)
   if [ -f /var/run/garage.${F}.pid ] && [ ! -z "$PID" ]; then
     echo "${F} is already running (pid file exists, prcesses running: $PID )."
   else
@@ -81,6 +90,19 @@ status)
 restart)
   $0 stop
   $0 start
+  ;;
+
+start-logger)
+  echo "Starting Logger Service"
+  F=loggerService.py
+  if [ -f /var/run/garage.${F}.pid ]; then
+    echo "${F} is already running (pid file exists)."
+    exit 1
+  fi
+  python /home/pi/GarageWeb/${F} &
+  PID=$!
+  echo $PID ${F} started
+  echo $PID >/var/run/garage.${F}.pid
   ;;
 
 start-controller)
