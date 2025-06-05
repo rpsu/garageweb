@@ -5,7 +5,6 @@ from webUtils import logger, user_ip_address, get_door_pwd, getStatus, openDoor,
 
 fileName = os.path.basename(__file__)
 API_CONTROLLER = "http://127.0.0.1:5080"
-API_LOGGER = "http://127.0.0.1:5081"
 debug = True
 
 # Door state constants.

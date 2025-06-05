@@ -19,13 +19,13 @@ DoorOpenMessageDelay = 300
 def logger(msg):
     if type(msg) == str and len(msg) > 0:
         payload = dict(log_entry='{meg}', source='{fileName}')
-        resp = requests.post("{API_LOGGER}/new", timeout=2, data=payload)
+        resp = requests.post(API_LOGGER + "/new", timeout=2, data=payload)
         return resp.status_code == 200
     return False
 
 def status():
     try:
-        resp = requests.get("{API_CONTROLLER}/status", timeout=2)
+        resp = requests.get(API_CONTROLLER + "/status", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
         logger("Watcher received from Controller API: " + str(e))
@@ -33,7 +33,7 @@ def status():
 
 def open():
     try:
-        resp = requests.get("{API_CONTROLLER}/open", timeout=2)
+        resp = requests.get(API_CONTROLLER + "/open", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
         logger("Watcher received from Controller API: " + str(e))
@@ -41,7 +41,7 @@ def open():
 
 def close():
     try:
-        resp = requests.get("{API_CONTROLLER}/close", timeout=2)
+        resp = requests.get(API_CONTROLLER + "/close", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
         logger("Watcher received from Controller API: " + str(e))
