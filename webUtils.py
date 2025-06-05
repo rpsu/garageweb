@@ -2,16 +2,16 @@ import controllerConfig, os.path, threading, datetime
 from datetime import datetime
 import requests
 
-lock = threading.Lock()
-
 fileName = os.path.basename(__file__)
+
+API_LOGGER = "http://127.0.0.1:5081"
 
 
 # APIs, Logger API
 def logger(msg):
     if type(msg) == str and len(msg) > 0:
         payload = dict(log_entry='{meg}', source='{fileName}')
-        resp = requests.post("{LOGGER_API}/new", timeout=2, data=payload)
+        resp = requests.post("{API_LOGGER}/new", timeout=2, data=payload)
         return resp.status_code == 200
     return False
 

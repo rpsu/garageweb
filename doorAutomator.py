@@ -19,13 +19,13 @@ DoorOpenMessageDelay = 300
 def logger(msg):
     if type(msg) == str and len(msg) > 0:
         payload = dict(log_entry='{meg}', source='{fileName}')
-        resp = requests.post("{LOGGER_API}/new", timeout=2, data=payload)
+        resp = requests.post("{API_LOGGER}/new", timeout=2, data=payload)
         return resp.status_code == 200
     return False
 
 def status():
     try:
-        resp = requests.get("{CONTROLLER_API}/status", timeout=2)
+        resp = requests.get("{API_CONTROLLER}/status", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
         logger("Watcher received from Controller API: " + str(e))
@@ -33,7 +33,7 @@ def status():
 
 def open():
     try:
-        resp = requests.get("{CONTROLLER_API}/open", timeout=2)
+        resp = requests.get("{API_CONTROLLER}/open", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
         logger("Watcher received from Controller API: " + str(e))
@@ -41,7 +41,7 @@ def open():
 
 def close():
     try:
-        resp = requests.get("{CONTROLLER_API}/close", timeout=2)
+        resp = requests.get("{API_CONTROLLER}/close", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
         logger("Watcher received from Controller API: " + str(e))
@@ -80,22 +80,22 @@ def doorMonitor():
 
             if (currentTimeDate - TimeDoorOpened).total_seconds() > DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
                 logger("Closing Garage Door automatically now since it has been left Open for  " +
-                    str(math.floor(controllerConfig.DoorAutoCloseDelay/60)) + " minutes", fileName)
+                    str(math.floor(DoorAutoCloseDelay/60)) + " minutes", fileName)
                 close(fileName)
                 DoorOpenTimer = 0
 
         # Door Status is Unknown
-        if status() == controllerConfig.STATE_BETWEEN:
+        if status() == STATE_BETWEEN:
             logger("Door Opening/Closing", fileName)
-            while status() == controllerConfig.STATE_BETWEEN:
+            while status() == STATE_BETWEEN:
                 time.sleep(10)
 
             else:
-                if status() == controllerConfig.STATE_DOWN:
+                if status() == STATE_DOWN:
                     logger("Door Closed", fileName)
                     DoorOpenTimer = 0
 
-                elif status() == controllerConfig.STATE_UP:
+                elif status() == STATE_UP:
                     # Start Door Open Timer
                     TimeDoorOpened = datetime.datetime.now()
                     logger("Door opened fully: " +
