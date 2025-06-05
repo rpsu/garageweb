@@ -1,6 +1,6 @@
-import atexit, signal, time, controllerConfig, os.path, threading
+import atexit, signal, time, controllerConfig, os.path, threading, requests
 import RPi.GPIO as GPIO
-from flask import Flask, json, requests
+from flask import Flask, json
 
 debug=True
 lock = threading.Lock()

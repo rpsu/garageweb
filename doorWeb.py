@@ -1,9 +1,7 @@
-import os.path, requests, json, logging, threading
+import os.path, json
 from flask import Flask, url_for, request, Response, make_response
 
 from webUtils import logger, user_ip_address, get_door_pwd, getStatus, openDoor, closeDoor, toggleDoor
-
-lock = threading.Lock()
 
 fileName = os.path.basename(__file__)
 API_CONTROLLER = "http://127.0.0.1:5080"

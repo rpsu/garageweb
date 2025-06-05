@@ -1,5 +1,5 @@
 import  math, time, os.path, datetime
-from flask import requests
+import requests
 
 fileName = os.path.basename(__file__)
 API_CONTROLLER = "http://127.0.0.1:5080"

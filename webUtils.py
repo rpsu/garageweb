@@ -1,6 +1,6 @@
 import controllerConfig, os.path, threading, datetime
 from datetime import datetime
-from flask import requests
+import requests
 
 lock = threading.Lock()
 
