@@ -12,12 +12,6 @@ LogLevel = 1
 VerboseConsole = False  # Wether or not print messages to console as well.
 DoorPassword = "12345678"
 
-# Close door automatically after seconds (if left fully opened)
-# DoorAutoCloseDelay = 1200
-DoorAutoCloseDelay = 480
-# Door left open message after seconds (if left fully opened)
-DoorOpenMessageDelay = 300
-
 # Define which GPIO pins do what. Use GPIO.BOARD mode.
 # Open and close may be the same or different.
 PINS_BUTTON_OPEN = 11

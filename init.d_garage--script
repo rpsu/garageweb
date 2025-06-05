@@ -33,9 +33,42 @@ if [ "$USER_ID" -ne "0" ]; then
 fi
 
 case "$1" in
+start)
+  echo "5 sec delay garage WEB start to allow Pi with camera module wake up."
+  sleep 1
+  $0 start-controller
+  sleep 2
+  $0 start-automator
+  sleep 2
+  $0 start-web
+  ;;
+
+stop)
+  $0 stop-web
+  sleep 2
+  $0 stop-automator
+  sleep 2
+  $0 stop-contoller
+  ;;
 
 status)
-  F=doorWebUI.py
+  F=doorController.py
+  PID=$(ps -ef | grep door.py | grep python | awk {'print $2'} | xargs)
+  if [ -f /var/run/garage.${F}.pid ] && [ ! -z "$PID" ]; then
+    echo "${F} is already running (pid file exists, prcesses running: $PID )."
+  else
+    echo "${F} is not running."
+  fi
+
+  F=doorAutomator.py
+  PID=$(ps -ef | grep door.py | grep python | awk {'print $2'} | xargs)
+  if [ -f /var/run/garage.${F}.pid ] && [ ! -z "$PID" ]; then
+    echo "${F} is already running (pid file exists, prcesses running: $PID )."
+  else
+    echo "${F} is not running."
+  fi
+
+  F=doorWeb.py
   PID=$(ps -ef | grep web.py | grep python | awk {'print $2'} | xargs)
   if [ -f /var/run/garage.${F}.pid ] && [ ! -z "$PID" ]; then
     echo "${F} is already running (pid file exists, prcesses running: $PID )."
@@ -43,13 +76,6 @@ status)
     echo "${F} is not running."
   fi
 
-  F=dooService.py
-  PID=$(ps -ef | grep door.py | grep python | awk {'print $2'} | xargs)
-  if [ -f /var/run/garage.${F}.pid ] && [ ! -z "$PID" ]; then
-    echo "${F} is already running (pid file exists, prcesses running: $PID )."
-  else
-    echo "${F} is not running."
-  fi
   ;;
 
 restart)
@@ -57,11 +83,9 @@ restart)
   $0 start
   ;;
 
-start)
-  echo "Delay garage start to allow Pi with camera module wake up."
-  sleep 5
-  echo "Starting Web monitor"
-  F=doorWebUI.py
+start-controller)
+  echo "Starting Door Controller"
+  F=doorController.py
   if [ -f /var/run/garage.${F}.pid ]; then
     echo "${F} is already running (pid file exists)."
     exit 1
@@ -72,9 +96,62 @@ start)
   echo $PID >/var/run/garage.${F}.pid
   ;;
 
-stop)
+start-automator)
+  echo "Starting Door Automator (first ensure Controller runs)"
+  $0 start-controller
+
+  F=doorAutomator.py
+  if [ -f /var/run/garage.${F}.pid ]; then
+    echo "${F} is already running (pid file exists)."
+    exit 1
+  fi
+  python /home/pi/GarageWeb/${F} &
+  PID=$!
+  echo $PID ${F} started
+  echo $PID >/var/run/garage.${F}.pid
+  ;;
+
+start-web)
+  echo "Starting Web monitor (first ensure Controller runs)"
+  $0 start-controller
+
+  F=doorWeb.py
+  if [ -f /var/run/garage.${F}.pid ]; then
+    echo "${F} is already running (pid file exists)."
+    exit 1
+  fi
+  python /home/pi/GarageWeb/${F} &
+  PID=$!
+  echo $PID ${F} started
+  echo $PID >/var/run/garage.${F}.pid
+  ;;
+
+stop-controller)
+  echo "Stopping Door Controller"
+
+  F=doorController.py
+  if [ -f /var/run/garage.${F}.pid ]; then
+    PID=$(cat /var/run/garage.${F}.pid)
+    echo Kill ${F} process "$PID"
+    pkill -F /var/run/garage.${F}.pid || echo Killing PID "$PID" failed.
+    rm /var/run/garage.${F}.pid || echo Removing PID "$PID" failed.
+  fi
+  ;;
+
+stop-automator)
+  echo "Stopping Door Automator"
+  F=doorAutomator.py
+  if [ -f /var/run/garage.${F}.pid ]; then
+    PID=$(cat /var/run/garage.${F}.pid)
+    echo Kill ${F} process "$PID"
+    pkill -F /var/run/garage.${F}.pid || echo Killing PID "$PID" failed.
+    rm /var/run/garage.${F}.pid || echo Removing PID "$PID" failed.
+  fi
+  ;;
+
+stop-web)
   echo "Stopping Garage Web"
-  F=doorWebUI.py
+  F=doorWeb.py
   if [ -f /var/run/garage.${F}.pid ]; then
     PID=$(cat /var/run/garage.${F}.pid)
     echo Kill ${F} process "$PID"
@@ -90,7 +167,7 @@ stop)
 
 help | *)
   echo "Usage:"
-  echo "service garage {start|stop|restart|start-web|start-door|stop-web|stop-door|status|help}"
+  echo "service garage {start|stop|restart|start-web|start-automator|stop-web|stop-automator|status|help}"
   ;;
 esac
 
