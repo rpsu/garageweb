@@ -45,6 +45,10 @@ def addLogEntry():
 
 
 if __name__ == '__main__':
+    # Increase the number of connections in the pool
+    write(app.config['MAXOVERFLOW'] + " connections", fileName)
+    app.config['MAXOVERFLOW'] = 10
+    write(app.config['MAXOVERFLOW'] + " connections", fileName)
     msg= 'Starting logger service from {fileName} '
     msg=msg + "(debug: " + str(debug) + ")!"
     write(msg, fileName)
