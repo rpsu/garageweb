@@ -115,7 +115,7 @@ def logfile():
 
 
 if __name__ == '__main__':
-    msg= 'Hello from {fileName} '
-    msg=msg + "(debug: " + str(debug) + ")!"
+    msg = f'Hello from {fileName} '
+    msg = msg + "(debug: " + str(debug) + ")!"
     logger(msg)
-    app.run(host={listen_to_ip}, port={listen_to_port}, debug={debug})
+    app.run(host=listen_to_ip, port=listen_to_port, debug=debug )

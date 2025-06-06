@@ -45,7 +45,7 @@ def addLogEntry():
 
 
 if __name__ == '__main__':
-    msg= 'Starting logger service from {fileName} '
+    msg= f'Starting logger service from {fileName} '
     msg=msg + "(debug: " + str(debug) + ")!"
     write(msg, fileName)
-    app.run(host={listen_to_ip}, port={listen_to_port}, debug={debug})
+    app.run(host=listen_to_ip, port=listen_to_port, debug=debug)

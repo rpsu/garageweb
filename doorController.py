@@ -2,7 +2,7 @@ import atexit, signal, time, controllerConfig, os.path, threading, requests
 import RPi.GPIO as GPIO
 from flask import Flask, json
 
-debug=True
+debug=controllerConfig.DEBUGGING
 lock = threading.Lock()
 
 fileName = os.path.basename(__file__)
@@ -129,11 +129,10 @@ def status():
 
 if __name__ == '__main__':
     try:
-        msg= 'Hello from {fileName}. '
-        msg=msg + "(debug: " + str(debug) + ")!"
+        msg = f'Hello from {fileName} '
+        msg = msg + "(debug: " + str(debug) + ")!"
         logger(msg)
-
         setup(fileName)
-        app.run(host={listen_to_ip}, port={listen_to_port}, debug={controllerConfig.DEBUGGING})
+        app.run(host=listen_to_ip, port=listen_to_port, debug={debug})
     finally:
         shutdown(json.dumps({"from": "flask.exit"}))
