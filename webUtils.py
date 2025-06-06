@@ -22,7 +22,7 @@ def getStatus():
         resp = requests.get( f"{API_CONTROLLER}/status", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
-        logger("Watcher received from Controller API: " + str(e))
+        logger("WebUtils geteStatus() received from Controller API: " + str(e))
         return None
 
 # APIs, Controller API
@@ -31,7 +31,7 @@ def openDoor():
         resp = requests.get( f"{API_CONTROLLER}/open", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
-        logger("Watcher received from Controller API: " + str(e))
+        logger("WebUtils openDoor() received from Controller API: " + str(e))
         return None
 
 # APIs, Controller API
@@ -40,7 +40,7 @@ def closeDoor():
         resp = requests.get( f"{API_CONTROLLER}/close", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
-        logger("Watcher received from Controller API: " + str(e))
+        logger("WebUtils closeDoor() received from Controller API: " + str(e))
         return None
 
 # Internal alias only.

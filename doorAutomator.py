@@ -28,7 +28,7 @@ def status():
         resp = requests.get(API_CONTROLLER + "/status", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
-        logger("Watcher received from Controller API: " + str(e))
+        logger("Automator status() received from Controller API: " + str(e))
         return None
 
 def open():
@@ -36,7 +36,7 @@ def open():
         resp = requests.get(API_CONTROLLER + "/open", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
-        logger("Watcher received from Controller API: " + str(e))
+        logger("Automator open() received from Controller API: " + str(e))
         return None
 
 def close():
@@ -44,7 +44,7 @@ def close():
         resp = requests.get(API_CONTROLLER + "/close", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
-        logger("Watcher received from Controller API: " + str(e))
+        logger("Automator close() received from Controller API: " + str(e))
         return None
 
 def toggle():
