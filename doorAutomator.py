@@ -10,6 +10,8 @@ STATE_UP = 'up'
 STATE_DOWN = 'down'
 STATE_BETWEEN = 'between'
 
+debug=True
+
 # Close door automatically after seconds (if left fully opened)
 # DoorAutoCloseDelay = 1200
 DoorAutoCloseDelay = 480
@@ -56,49 +58,52 @@ def doorMonitor():
 
     DoorOpenTimer = 0  # Default start status turns timer off
     DoorOpenTimerMessageSent = 1  # Turn off messages until timer is started
+    logger("Door automator is starting (debug: )" + str(debug) + ")." )
 
     while True:
         TimeDoorOpened = datetime.datetime.now()
         # Start the timer if door is open at the boot time.
         if status() == STATE_UP:  # Door is Open
-            logger("Door is Open and timer is running (started " + str(TimeDoorOpened) + ".", fileName)
+            logger("Door is open and timer is running (started " + str(TimeDoorOpened) + ".")
             DoorOpenTimer = 1
         else:
+            if debug:
+                logger("Door is closed.")
             DoorOpenTimer = 0
         time.sleep(5)
             # Door Open Timer has Started
         if DoorOpenTimer == 1:
             logger("Door timer is ON with delay of " +
-                str(math.floor(DoorOpenMessageDelay/60)) + " minutes. Door is " + status() + ".", fileName)
+                str(math.floor(DoorOpenMessageDelay/60)) + " minutes. Door is " + status() + ".")
 
             currentTimeDate = datetime.datetime.now()
 
             if (currentTimeDate - TimeDoorOpened).total_seconds() > DoorOpenMessageDelay and DoorOpenTimerMessageSent == 0:
                 logger("Your Garage Door has been Open for " +
-                    str(math.floor(DoorOpenMessageDelay/60)) + " minutes", fileName)
+                    str(math.floor(DoorOpenMessageDelay/60)) + " minutes")
                 DoorOpenTimerMessageSent = 1
 
             if (currentTimeDate - TimeDoorOpened).total_seconds() > DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
                 logger("Closing Garage Door automatically now since it has been left Open for  " +
-                    str(math.floor(DoorAutoCloseDelay/60)) + " minutes", fileName)
+                    str(math.floor(DoorAutoCloseDelay/60)) + " minutes")
                 close(fileName)
                 DoorOpenTimer = 0
 
         # Door Status is Unknown
         if status() == STATE_BETWEEN:
-            logger("Door Opening/Closing", fileName)
+            logger("Door Opening/Closing")
             while status() == STATE_BETWEEN:
                 time.sleep(10)
 
             else:
                 if status() == STATE_DOWN:
-                    logger("Door Closed", fileName)
+                    logger("Door Closed")
                     DoorOpenTimer = 0
 
                 elif status() == STATE_UP:
                     # Start Door Open Timer
                     TimeDoorOpened = datetime.datetime.now()
                     logger("Door opened fully: " +
-                        str(TimeDoorOpened), fileName)
+                        str(TimeDoorOpened))
                     DoorOpenTimer = 1
                     DoorOpenTimerMessageSent = 0
