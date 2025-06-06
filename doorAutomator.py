@@ -107,3 +107,14 @@ def doorMonitor():
                         str(TimeDoorOpened))
                     DoorOpenTimer = 1
                     DoorOpenTimerMessageSent = 0
+
+if __name__ == '__main__':
+    try:
+        msg = f'Hello from {fileName} '
+        msg = msg + "(debug: " + str(debug) + ")!"
+        logger(msg)
+        doorMonitor()
+    finally:
+        msg = f'Door Automator is shut down {fileName} '
+        msg = msg + "(debug: " + str(debug) + ")!"
+        logger(msg)
