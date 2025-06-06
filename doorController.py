@@ -82,9 +82,9 @@ def setup(initializer):
 
 # This triggers the Opening/Closing the door.
 @app.route('/close', methods=['GET'])
-def close(fromFile):
+def close():
     with lock:
-        msg = "Garage door closing triggered by " + fromFile
+        msg = "Garage door closing triggered "
         if controllerConfig.DRY_RUN:
             msg = "** DRY RUN ONLY ** " + msg
         logger(msg)
@@ -95,9 +95,9 @@ def close(fromFile):
 
 # This triggers the Opening/Closing the door.
 @app.route('/open', methods=['GET'])
-def open(fromFile):
+def open():
     with lock:
-        msg = "Garage door opening triggered by " + fromFile
+        msg = "Garage door opening triggered "
         if controllerConfig.DRY_RUN:
             msg = "** DRY RUN ONLY ** " + msg
         logger(msg)
