@@ -1,6 +1,6 @@
 import atexit, signal, time, controllerConfig, os.path, threading, requests
 import RPi.GPIO as GPIO
-from flask import Flask, json
+from flask import Flask, json, jsonify
 
 debug=controllerConfig.DEBUGGING
 lock = threading.Lock()
@@ -91,6 +91,7 @@ def close():
         GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.LOW)
         time.sleep(.5)
         GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.HIGH)
+        return jsonify({'message': 'success'}), 200
 
 
 # This triggers the Opening/Closing the door.
@@ -104,6 +105,7 @@ def open():
         GPIO.output(controllerConfig.PINS_BUTTON_OPEN, GPIO.LOW)
         time.sleep(.5)
         GPIO.output(controllerConfig.PINS_BUTTON_OPEN, GPIO.HIGH)
+        return jsonify({'message': 'success'}), 200
 
 
 # Read door status from magnetic switches connected to GPIO
@@ -114,17 +116,19 @@ def status():
         if GPIO.input(controllerConfig.SWITCH_LOWER) == GPIO.HIGH and GPIO.input(controllerConfig.SWITCH_UPPER) == GPIO.HIGH:
             if controllerConfig.LogLevel >= 1:
                 logger("Garage is Opening/Closing")
-            return json.dumps({"door": f"{controllerConfig.STATE_BETWEEN}"})
+            return jsonify({"door": f"{controllerConfig.STATE_BETWEEN}"}), 200
+
         else:
             if GPIO.input(controllerConfig.SWITCH_LOWER) == GPIO.LOW:
                 if controllerConfig.LogLevel >= 2:
                     logger("Garage is Closed")
-                return json.dumps({"door": f"{controllerConfig.STATE_DOWN}"})
+                return jsonify({"door": f"{controllerConfig.STATE_DOWN}"}), 200
 
             if GPIO.input(controllerConfig.SWITCH_UPPER) == GPIO.LOW:
                 if controllerConfig.LogLevel >= 1:
                     logger("Door is Open")
-                return json.dumps({"door": f"{controllerConfig.STATE_UP}"})
+                return jsonify({"door": f"{controllerConfig.STATE_UP}"}), 200
+        return jsonify({"door": "?"}), 523
 
 
 if __name__ == '__main__':
@@ -133,6 +137,6 @@ if __name__ == '__main__':
         msg = msg + "(debug: " + str(debug) + ")!"
         logger(msg)
         setup(fileName)
-        app.run(host=listen_to_ip, port=listen_to_port, debug={debug})
+        app.run(host=listen_to_ip, port=listen_to_port, debug=debug )
     finally:
         shutdown(json.dumps({"from": "flask.exit"}))
