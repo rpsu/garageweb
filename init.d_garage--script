@@ -34,14 +34,16 @@ fi
 
 case "$1" in
 start)
-  echo "5 sec delay garage WEB start to allow Pi with camera module wake up."
-  sleep 1
+  # echo "5 sec delay to allow Pi with camera module wake up."
+  echo "5 sec delay to let logger start properly."
   $0 start-logger
-  sleep 2
+  sleep 5
+  echo "5 sec delay also to allow controller to boot."
   $0 start-controller
-  sleep 2
+  sleep 5
+  echo "5 sec delay also to allow automator to boot."
   $0 start-automator
-  sleep 2
+  sleep 5
   $0 start-web
   ;;
 
@@ -49,6 +51,8 @@ stop)
   $0 stop-web
   $0 stop-automator
   $0 stop-controller
+  echo "5 sec delay to let other services shut down before turning off the logger service."
+  sleep 5
   $0 stop-logger
   ;;
 
@@ -99,7 +103,7 @@ start-logger)
     echo "${F} is already running (pid file exists)."
     exit 1
   fi
-  python /home/pi/GarageWeb/${F} &
+  python3 /home/pi/GarageWeb/${F} &
   PID=$!
   echo $PID ${F} started
   echo $PID >/var/run/garage.${F}.pid
@@ -112,7 +116,7 @@ start-controller)
     echo "${F} is already running (pid file exists)."
     exit 1
   fi
-  python /home/pi/GarageWeb/${F} &
+  python3 /home/pi/GarageWeb/${F} &
   PID=$!
   echo $PID ${F} started
   echo $PID >/var/run/garage.${F}.pid
@@ -125,7 +129,7 @@ start-automator)
     echo "${F} is already running (pid file exists)."
     exit 1
   fi
-  python /home/pi/GarageWeb/${F} &
+  python3 /home/pi/GarageWeb/${F} &
   PID=$!
   echo $PID ${F} started
   echo $PID >/var/run/garage.${F}.pid
@@ -138,7 +142,7 @@ start-web)
     echo "${F} is already running (pid file exists)."
     exit 1
   fi
-  python /home/pi/GarageWeb/${F} &
+  python3 /home/pi/GarageWeb/${F} &
   PID=$!
   echo $PID ${F} started
   echo $PID >/var/run/garage.${F}.pid
