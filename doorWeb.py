@@ -93,11 +93,11 @@ def openTheDoorPlease():
     # This triggers the Opening/Closing the door.
     status = getStatus()
     if status == STATE_UP:
-        closeDoor(fileName)
+        closeDoor()
     elif status == STATE_DOWN:
-        openDoor(fileName)
+        openDoor()
     elif status == STATE_BETWEEN:
-        toggleDoor(fileName)
+        toggleDoor()
 
     logger("Door action triggered. The door may still be closing or opening.")
     headers = dict()
