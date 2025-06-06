@@ -25,7 +25,7 @@ GPIO_SETUP = False
 
 def logger(msg):
     if type(msg) == str and len(msg) > 0:
-        payload = dict(log_entry='{meg}', source='{fileName}')
+        payload = dict(log_entry=msg, source=fileName)
         resp = requests.post (API_LOGGER + "/new", timeout=2, data=payload)
         return resp.status_code == 200
     return False

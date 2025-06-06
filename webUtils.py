@@ -11,15 +11,15 @@ API_CONTROLLER = "http://127.0.0.1:5080"
 # APIs, Logger API
 def logger(msg):
     if type(msg) == str and len(msg) > 0:
-        payload = dict(log_entry='{meg}', source='{fileName}')
-        resp = requests.post(API_LOGGER + "/new", timeout=2, data=payload)
+        payload = dict(log_entry=msg, source=fileName)
+        resp = requests.post( f"{API_LOGGER}/new", timeout=2, data=payload)
         return resp.status_code == 200
     return False
 
 # APIs, Controller API
 def getStatus():
     try:
-        resp = requests.get(API_CONTROLLER + "/status", timeout=2)
+        resp = requests.get( f"{API_CONTROLLER}/status", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
         logger("Watcher received from Controller API: " + str(e))
@@ -28,7 +28,7 @@ def getStatus():
 # APIs, Controller API
 def openDoor():
     try:
-        resp = requests.get(API_CONTROLLER + "/open", timeout=2)
+        resp = requests.get( f"{API_CONTROLLER}/open", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
         logger("Watcher received from Controller API: " + str(e))
@@ -37,7 +37,7 @@ def openDoor():
 # APIs, Controller API
 def closeDoor():
     try:
-        resp = requests.get(API_CONTROLLER + "/close", timeout=2)
+        resp = requests.get( f"{API_CONTROLLER}/close", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
         logger("Watcher received from Controller API: " + str(e))
