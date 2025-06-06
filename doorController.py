@@ -114,17 +114,17 @@ def status():
         if GPIO.input(controllerConfig.SWITCH_LOWER) == GPIO.HIGH and GPIO.input(controllerConfig.SWITCH_UPPER) == GPIO.HIGH:
             if controllerConfig.LogLevel >= 1:
                 logger("Garage is Opening/Closing")
-            return controllerConfig.STATE_BETWEEN
+            return json.dumps({"door": f"{controllerConfig.STATE_BETWEEN}"})
         else:
             if GPIO.input(controllerConfig.SWITCH_LOWER) == GPIO.LOW:
                 if controllerConfig.LogLevel >= 2:
                     logger("Garage is Closed")
-                return controllerConfig.STATE_DOWN
+                return json.dumps({"door": f"{controllerConfig.STATE_DOWN}"})
 
             if GPIO.input(controllerConfig.SWITCH_UPPER) == GPIO.LOW:
                 if controllerConfig.LogLevel >= 1:
                     logger("Door is Open")
-                return controllerConfig.STATE_UP
+                return json.dumps({"door": f"{controllerConfig.STATE_UP}"})
 
 
 if __name__ == '__main__':
