@@ -14,7 +14,7 @@ debug=True
 
 # Close door automatically after seconds (if left fully opened)
 # DoorAutoCloseDelay = 1200
-DoorAutoCloseDelay = 480
+DoorAutoCloseDelay = 30
 # Door left open message after seconds (if left fully opened)
 DoorOpenMessageDelay = 300
 

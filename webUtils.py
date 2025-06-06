@@ -65,10 +65,10 @@ def get_door_pwd():
     cwd = os.path.dirname(os.path.abspath(__file__))
     file = os.path.join(cwd, passwd_file)
     if os.path.isfile(file):
-        logger("Using passwd from a file '{file}'.")
+        logger(f"Using passwd from a file '{file}'.")
         # Reads all of the content without newlines into a password.
         with open(file) as f:
             return f.read().splitlines()[0]
     else:
-        logger("Passwd file '{file}' was not found. Using default passwd.")
+        logger(f"Passwd file '{file}' was not found. Using default passwd.")
         return controllerConfig.DoorPassword
