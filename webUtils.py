@@ -22,7 +22,7 @@ def getStatus():
         resp = requests.get( f"{API_CONTROLLER}/status", timeout=2)
         return resp.json().get("door", '')
     except Exception as e:
-        logger("WebUtils geteStatus() received from Controller API: " + str(e))
+        logger("WebUtils getStatus() received from Controller API: " + str(e))
         return None
 
 # APIs, Controller API
@@ -65,11 +65,10 @@ def get_door_pwd():
     cwd = os.path.dirname(os.path.abspath(__file__))
     file = os.path.join(cwd, passwd_file)
     if os.path.isfile(file):
-        logger("Using passwd from a file: " + file, fileName)
+        logger("Using passwd from a file '{file}'.")
         # Reads all of the content without newlines into a password.
         with open(file) as f:
             return f.read().splitlines()[0]
     else:
-        logger("Passwd file was not found:" + file +
-            ". Using default passwd.", fileName)
+        logger("Passwd file '{file}' was not found. Using default passwd.")
         return controllerConfig.DoorPassword
