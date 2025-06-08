@@ -32,14 +32,13 @@ def logger(msg):
 def shutdown(*args):
     global GPIO_SETUP
     logger("GPIO shutdown() called with: " + ', '.join(args))
-    with lock:
-        if GPIO_SETUP:
-            logger("Cleaning up GPIO.")
-            GPIO.cleanup()
-            logger("GPIO cleaned up.")
-            GPIO_SETUP=False
-        else:
-            logger("GPIO cleaning not done since GPIO_SETUP is false.")
+    if GPIO_SETUP:
+        logger("Cleaning up GPIO.")
+        GPIO.cleanup()
+        logger("GPIO cleaned up.")
+        GPIO_SETUP=False
+    else:
+        logger("GPIO cleaning not done since GPIO_SETUP is false.")
 
 atexit.register(shutdown)
 signal.signal(signal.SIGINT, lambda s, f: exit(0))
@@ -112,7 +111,6 @@ def open():
 # Read door status from magnetic switches connected to GPIO
 @app.route('/status', methods=['GET'])
 def status():
-    # threading lock to avoid writing to log file at the same time.
     if GPIO.input(controllerConfig.SWITCH_LOWER) == GPIO.HIGH and GPIO.input(controllerConfig.SWITCH_UPPER) == GPIO.HIGH:
         if controllerConfig.LogLevel >= 1:
             logger("Garage is Opening/Closing")
