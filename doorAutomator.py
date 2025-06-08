@@ -62,9 +62,9 @@ def doorMonitor():
     while True:
         # Start the timer if door is open at the boot time.
         if status() == STATE_UP:  # Door is Open
-            logger("Door is open and timer is running (started " + str(TimeDoorOpened) + ".")
             if TimeDoorOpened is None:
                 TimeDoorOpened = datetime.datetime.now()
+            logger("Door is open and timer is running (started " + str(TimeDoorOpened.strftime("%c")) + ".")
         else:
             if debug:
                 logger("Door is closed.")
