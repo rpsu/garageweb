@@ -82,7 +82,7 @@ def doorMonitor():
 
             if (currentTimeDate - TimeDoorOpened).total_seconds() > DoorOpenMessageDelay and DoorOpenTimerMessageSent == 0:
                 logger("Your Garage Door has been Open for " +
-                    str(math.floor(DoorOpenMessageDelay/60)) + " minutes")
+                    str(math.floor(DoorAutoCloseDelay/60)) + " minutes")
                 DoorOpenTimerMessageSent = 1
 
             if (currentTimeDate - TimeDoorOpened).total_seconds() > DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
