@@ -28,22 +28,20 @@ def logger(msg):
 def status():
     try:
         resp = requests.get(API_CONTROLLER + "/status", timeout=2)
+        if debug:
+            logger("Automator status() received status from Controller API: " + resp.json().get('door', 'n/a'))
+
         return resp.json().get("door", '')
     except Exception as e:
         logger("Automator status() received from Controller API: " + str(e))
         return None
 
-def open():
-    try:
-        resp = requests.get(API_CONTROLLER + "/open", timeout=2)
-        return resp.json().get("door", '')
-    except Exception as e:
-        logger("Automator open() received from Controller API: " + str(e))
-        return None
-
 def close():
     try:
         resp = requests.get(API_CONTROLLER + "/close", timeout=2)
+        if debug:
+            logger("Automator close() received status from Controller API: " + resp.json().get('door', 'n/a'))
+
         return resp.json().get("door", '')
     except Exception as e:
         logger("Automator close() received from Controller API: " + str(e))
@@ -67,7 +65,6 @@ def doorMonitor():
             logger("Door is open and timer is running (started " + str(TimeDoorOpened) + ".")
             if TimeDoorOpened is None:
                 TimeDoorOpened = datetime.datetime.now()
-            DoorOpenTimer = 1
         else:
             if debug:
                 logger("Door is closed.")
@@ -88,7 +85,7 @@ def doorMonitor():
             if (currentTimeDate - TimeDoorOpened).total_seconds() > DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
                 logger("Closing Garage Door automatically now since it has been left Open for  " +
                     str(math.floor(DoorAutoCloseDelay/60)) + " minutes")
-                close(fileName)
+                close()
 
         # Door Status is Unknown
         if status() == STATE_BETWEEN:
