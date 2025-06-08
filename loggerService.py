@@ -3,8 +3,8 @@ from datetime import datetime
 from flask import Flask, request, jsonify
 
 fileName = os.path.basename(__file__)
-verboseConsole = True
-debug = True
+verboseConsole = False
+debug = False
 
 lock = threading.Lock()
 logFilePath = "/home/pi/GarageWeb/static/log.txt"
