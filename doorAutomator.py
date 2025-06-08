@@ -10,11 +10,10 @@ STATE_UP = 'up'
 STATE_DOWN = 'down'
 STATE_BETWEEN = 'between'
 
-debug=True
+debug = False
 
 # Close door automatically after seconds (if left fully opened)
-# DoorAutoCloseDelay = 1200
-DoorAutoCloseDelay = 30
+DoorAutoCloseDelay = 360
 # Door left open message after seconds (if left fully opened)
 DoorOpenMessageDelay = 300
 
@@ -72,7 +71,7 @@ def doorMonitor():
         if status() == STATE_UP:  # Door is Open
             if TimeDoorOpened is None:
                 TimeDoorOpened = datetime.datetime.now()
-            logger("Door is open and timer is running [" + str(timeLeft(TimeDoorOpened))+ "] (started " + str(TimeDoorOpened.strftime("%X")) + ").")
+            logger("Door is open and timer is running [now left " + str(DoorAutoCloseDelay - math.floor(timeLeft(TimeDoorOpened)))+ " s] (started " + str(TimeDoorOpened.strftime("%X")) + ").")
         else:
             if debug:
                 logger("Door is closed.")
