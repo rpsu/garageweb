@@ -72,7 +72,7 @@ def doorMonitor():
         if status() == STATE_UP:  # Door is Open
             if TimeDoorOpened is None:
                 TimeDoorOpened = datetime.datetime.now()
-            logger("Door is open and timer is running (started " + str(TimeDoorOpened.strftime("%x %X")) + ".")
+            logger("Door is open and timer is running [" + timeLeft(TimeDoorOpened)+ "] (started " + str(TimeDoorOpened.strftime("%X")) + ").")
         else:
             if debug:
                 logger("Door is closed.")
