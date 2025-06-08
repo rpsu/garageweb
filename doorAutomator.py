@@ -56,23 +56,25 @@ def toggle():
 # Read door status from magnetic switches connected to GPIO
 def doorMonitor():
 
-    DoorOpenTimer = 0  # Default start status turns timer off
     DoorOpenTimerMessageSent = 1  # Turn off messages until timer is started
     logger("Door automator is starting (debug: )" + str(debug) + ")." )
 
+    # TimeDoorOpened also implies the door is opened (fully) wnen value is not None.
+    TimeDoorOpened = None
     while True:
-        TimeDoorOpened = datetime.datetime.now()
         # Start the timer if door is open at the boot time.
         if status() == STATE_UP:  # Door is Open
             logger("Door is open and timer is running (started " + str(TimeDoorOpened) + ".")
+            if TimeDoorOpened is None:
+                TimeDoorOpened = datetime.datetime.now()
             DoorOpenTimer = 1
         else:
             if debug:
                 logger("Door is closed.")
-            DoorOpenTimer = 0
+            TimeDoorOpened = None
         time.sleep(5)
             # Door Open Timer has Started
-        if DoorOpenTimer == 1:
+        if TimeDoorOpened is not None:
             logger("Door timer is ON with delay of " +
                 str(math.floor(DoorOpenMessageDelay/60)) + " minutes. Door is " + status() + ".")
 
@@ -87,7 +89,6 @@ def doorMonitor():
                 logger("Closing Garage Door automatically now since it has been left Open for  " +
                     str(math.floor(DoorAutoCloseDelay/60)) + " minutes")
                 close(fileName)
-                DoorOpenTimer = 0
 
         # Door Status is Unknown
         if status() == STATE_BETWEEN:
@@ -98,14 +99,12 @@ def doorMonitor():
             else:
                 if status() == STATE_DOWN:
                     logger("Door Closed")
-                    DoorOpenTimer = 0
 
                 elif status() == STATE_UP:
                     # Start Door Open Timer
                     TimeDoorOpened = datetime.datetime.now()
                     logger("Door opened fully: " +
                         str(TimeDoorOpened))
-                    DoorOpenTimer = 1
                     DoorOpenTimerMessageSent = 0
 
 if __name__ == '__main__':
