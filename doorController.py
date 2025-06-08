@@ -1,4 +1,4 @@
-import atexit, signal, time, controllerConfig, os.path, threading, requests
+import atexit, signal, time, controllerConfig, os.path, threading, requests, datetime
 import RPi.GPIO as GPIO
 from flask import Flask, json, jsonify
 
@@ -83,14 +83,19 @@ def setup(initializer):
 # This triggers the Opening/Closing the door.
 @app.route('/close', methods=['GET'])
 def close():
+    msg = "Garage door close route called "
+    if controllerConfig.DRY_RUN:
+        msg = "** DRY RUN ONLY ** " + msg
+    logger(msg)
     with lock:
-        msg = "Garage door closing triggered "
+        msg = "Toggling RasPi pins @ " + datetime.datetime.now().strftime("%X")
         if controllerConfig.DRY_RUN:
             msg = "** DRY RUN ONLY ** " + msg
-        logger(msg)
         GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.LOW)
+        msg = "Toggling RasPi pins [" + GPIO.input(controllerConfig.PINS_BUTTON_CLOSE) + "] @ " + datetime.datetime.now().strftime("%X")
         time.sleep(.5)
         GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.HIGH)
+        msg = "Toggling RasPi pins [" + GPIO.input(controllerConfig.PINS_BUTTON_CLOSE) + "] @ " + datetime.datetime.now().strftime("%X")
         return jsonify({'message': 'success'}), 200
 
 
