@@ -89,10 +89,10 @@ def close():
     if controllerConfig.DRY_RUN:
         msg = "** DRY RUN ONLY ** " + msg
     GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.LOW)
-    msg = "Toggling RasPi pins [" + GPIO.input(controllerConfig.PINS_BUTTON_CLOSE) + "] @ " + datetime.datetime.now().strftime("%X")
+    msg = "Toggling RasPi pins [" + str(GPIO.input(controllerConfig.PINS_BUTTON_CLOSE)) + "] @ " + datetime.datetime.now().strftime("%X")
     time.sleep(.5)
     GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.HIGH)
-    msg = "Toggling RasPi pins [" + GPIO.input(controllerConfig.PINS_BUTTON_CLOSE) + "] @ " + datetime.datetime.now().strftime("%X")
+    msg = "Toggling RasPi pins [" + str(GPIO.input(controllerConfig.PINS_BUTTON_CLOSE)) + "] @ " + datetime.datetime.now().strftime("%X")
     return jsonify({'message': 'success'}), 200
 
 
