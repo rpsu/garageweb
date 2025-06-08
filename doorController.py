@@ -1,9 +1,8 @@
-import atexit, signal, time, controllerConfig, os.path, threading, requests, datetime
+import atexit, signal, time, controllerConfig, os.path, requests, datetime
 import RPi.GPIO as GPIO
 from flask import Flask, json, jsonify
 
 debug=controllerConfig.DEBUGGING
-lock = threading.Lock()
 
 fileName = os.path.basename(__file__)
 
@@ -18,7 +17,6 @@ listen_to_port = 5080
 from webUtils import logger
 
 fileName = os.path.basename(__file__)
-lock = threading.Lock()
 
 GPIO_SETUP = False
 
@@ -87,53 +85,50 @@ def close():
     if controllerConfig.DRY_RUN:
         msg = "** DRY RUN ONLY ** " + msg
     logger(msg)
-    with lock:
-        msg = "Toggling RasPi pins @ " + datetime.datetime.now().strftime("%X")
-        if controllerConfig.DRY_RUN:
-            msg = "** DRY RUN ONLY ** " + msg
-        GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.LOW)
-        msg = "Toggling RasPi pins [" + GPIO.input(controllerConfig.PINS_BUTTON_CLOSE) + "] @ " + datetime.datetime.now().strftime("%X")
-        time.sleep(.5)
-        GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.HIGH)
-        msg = "Toggling RasPi pins [" + GPIO.input(controllerConfig.PINS_BUTTON_CLOSE) + "] @ " + datetime.datetime.now().strftime("%X")
-        return jsonify({'message': 'success'}), 200
+    msg = "Toggling RasPi pins @ " + datetime.datetime.now().strftime("%X")
+    if controllerConfig.DRY_RUN:
+        msg = "** DRY RUN ONLY ** " + msg
+    GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.LOW)
+    msg = "Toggling RasPi pins [" + GPIO.input(controllerConfig.PINS_BUTTON_CLOSE) + "] @ " + datetime.datetime.now().strftime("%X")
+    time.sleep(.5)
+    GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.HIGH)
+    msg = "Toggling RasPi pins [" + GPIO.input(controllerConfig.PINS_BUTTON_CLOSE) + "] @ " + datetime.datetime.now().strftime("%X")
+    return jsonify({'message': 'success'}), 200
 
 
 # This triggers the Opening/Closing the door.
 @app.route('/open', methods=['GET'])
 def open():
-    with lock:
-        msg = "Garage door opening triggered "
-        if controllerConfig.DRY_RUN:
-            msg = "** DRY RUN ONLY ** " + msg
-        logger(msg)
-        GPIO.output(controllerConfig.PINS_BUTTON_OPEN, GPIO.LOW)
-        time.sleep(.5)
-        GPIO.output(controllerConfig.PINS_BUTTON_OPEN, GPIO.HIGH)
-        return jsonify({'message': 'success'}), 200
+    msg = "Garage door opening triggered "
+    if controllerConfig.DRY_RUN:
+        msg = "** DRY RUN ONLY ** " + msg
+    logger(msg)
+    GPIO.output(controllerConfig.PINS_BUTTON_OPEN, GPIO.LOW)
+    time.sleep(.5)
+    GPIO.output(controllerConfig.PINS_BUTTON_OPEN, GPIO.HIGH)
+    return jsonify({'message': 'success'}), 200
 
 
 # Read door status from magnetic switches connected to GPIO
 @app.route('/status', methods=['GET'])
 def status():
     # threading lock to avoid writing to log file at the same time.
-    with lock:
-        if GPIO.input(controllerConfig.SWITCH_LOWER) == GPIO.HIGH and GPIO.input(controllerConfig.SWITCH_UPPER) == GPIO.HIGH:
+    if GPIO.input(controllerConfig.SWITCH_LOWER) == GPIO.HIGH and GPIO.input(controllerConfig.SWITCH_UPPER) == GPIO.HIGH:
+        if controllerConfig.LogLevel >= 1:
+            logger("Garage is Opening/Closing")
+        return jsonify({"door": f"{controllerConfig.STATE_BETWEEN}"}), 200
+
+    else:
+        if GPIO.input(controllerConfig.SWITCH_LOWER) == GPIO.LOW:
+            if controllerConfig.LogLevel >= 2:
+                logger("Garage is Closed")
+            return jsonify({"door": f"{controllerConfig.STATE_DOWN}"}), 200
+
+        if GPIO.input(controllerConfig.SWITCH_UPPER) == GPIO.LOW:
             if controllerConfig.LogLevel >= 1:
-                logger("Garage is Opening/Closing")
-            return jsonify({"door": f"{controllerConfig.STATE_BETWEEN}"}), 200
-
-        else:
-            if GPIO.input(controllerConfig.SWITCH_LOWER) == GPIO.LOW:
-                if controllerConfig.LogLevel >= 2:
-                    logger("Garage is Closed")
-                return jsonify({"door": f"{controllerConfig.STATE_DOWN}"}), 200
-
-            if GPIO.input(controllerConfig.SWITCH_UPPER) == GPIO.LOW:
-                if controllerConfig.LogLevel >= 1:
-                    logger("Door is Open")
-                return jsonify({"door": f"{controllerConfig.STATE_UP}"}), 200
-        return jsonify({"door": "?"}), 523
+                logger("Door is Open")
+            return jsonify({"door": f"{controllerConfig.STATE_UP}"}), 200
+    return jsonify({"door": "?"}), 523
 
 
 if __name__ == '__main__':
