@@ -54,9 +54,9 @@ def toggle():
 def timeLeft(startTime, format = 's'):
     currentTimeDate = datetime.datetime.now()
     diff = (currentTimeDate - startTime).total_seconds()
-    if format = 's':
+    if format == 's' or format == 'sec':
         return diff
-    if format = 'm':
+    if format == 'm' or format == 'min':
         return math.floor(diff)
 
 # Read door status from magnetic switches connected to GPIO
