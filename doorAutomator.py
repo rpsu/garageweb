@@ -50,6 +50,14 @@ def close():
 def toggle():
     return close()
 
+# Calculate time left compared to the provided value. Optional format, m for mimutes.
+def timeLeft(startTime, format = 's'):
+    currentTimeDate = datetime.datetime.now()
+    diff = (currentTimeDate - startTime).total_seconds()
+    if format = 's':
+        return diff
+    if format = 'm':
+        return math.floor(diff)
 
 # Read door status from magnetic switches connected to GPIO
 def doorMonitor():
@@ -77,14 +85,14 @@ def doorMonitor():
 
             currentTimeDate = datetime.datetime.now()
 
-            if (currentTimeDate - TimeDoorOpened).total_seconds() > DoorOpenMessageDelay and DoorOpenTimerMessageSent == 0:
+            if timeLeft(TimeDoorOpened) > DoorOpenMessageDelay and DoorOpenTimerMessageSent == 0:
                 logger("Your Garage Door has been Open for " +
                     str(math.floor(DoorAutoCloseDelay/60)) + " minutes")
                 DoorOpenTimerMessageSent = 1
 
-            if (currentTimeDate - TimeDoorOpened).total_seconds() > DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
+            if timeLeft(TimeDoorOpened) > DoorAutoCloseDelay and DoorOpenTimerMessageSent == 1:
                 logger("Closing Garage Door automatically now since it has been left Open for  " +
-                    str(math.floor(DoorAutoCloseDelay/60)) + " minutes")
+                    str(timeLeft(TimeDoorOpened, 'min')) + " minutes")
                 close()
 
         # Door Status is Unknown
