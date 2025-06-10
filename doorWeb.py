@@ -101,7 +101,8 @@ def openTheDoorPlease():
 
     logger("Door action triggered. The door may still be closing or opening.")
     headers = dict()
-    headers['Location'] = url_for('index')
+    # The app runs behind a proxy so the full URLs need to be forced to HTTPS scheme.
+    headers['Location'] = url_for('index'_external=True, _scheme='https')
     return Response(
         'Button pressed.', 304, headers)
 
