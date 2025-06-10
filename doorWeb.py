@@ -1,5 +1,5 @@
 import os.path, json
-from flask import Flask, url_for, request, Response, make_response
+from flask import Flask, url_for, request, Response, make_response, redirect
 
 from webUtils import logger, user_ip_address, get_door_pwd, getStatus, openDoor, closeDoor, toggleDoor
 
@@ -100,12 +100,8 @@ def openTheDoorPlease():
         toggleDoor()
 
     logger("Door action triggered. The door may still be closing or opening.")
-    headers = dict()
     # The app runs behind a proxy so the full URLs need to be forced to HTTPS scheme.
-    headers['Location'] = url_for('index'_external=True, _scheme='https')
-    return Response(
-        'Button pressed.', 304, headers)
-
+    return redirect(url_for('index', _external=True, _scheme='https'))
 
 # Routes, API endpoint /log endpoint
 @ app.route('/log')
