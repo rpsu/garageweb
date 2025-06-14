@@ -4,9 +4,11 @@ from flask import Flask, request, jsonify
 from dotenv import dotenv_values
 
 # Load .env files
+dir = os.path.dirname(__file__) + "/"
+fileName = os.path.basename(__file__)
 config = {
-    **dotenv_values(".env.default"),  # load what came with the repo
-    **dotenv_values(".env"),  # load overrides from the local
+    **dotenv_values(dir + ".env.default"),  # load what came with the repo
+    **dotenv_values(dir + ".env"),  # load overrides from the local
 }
 
 for k, v in config.items():
@@ -17,7 +19,6 @@ for k, v in config.items():
     elif re.search("\d", config.get(k)) is not None:
         config[k] = int(config[k])
 
-fileName = os.path.basename(__file__)
 debug = config.get("DEBUG", False)
 
 if debug:

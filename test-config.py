@@ -2,11 +2,9 @@ import os.path, re
 from datetime import datetime
 from dotenv import dotenv_values
 
-dir = os.path.curdir
-print("Dir: " + dir)
-dir = os.path.dirname(__file__)
-print("Dir: " + dir)
-print("File: " + os.path.basename(__file__))
+dir = os.path.dirname(__file__) + "/"
+print("Working dir: " + dir)
+print("File: " + dir + os.path.basename(__file__))
 print("Time: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 print("Loading config.")
 # Load .env files
