@@ -1,4 +1,4 @@
-import controllerConfig, os.path, threading, datetime
+import os.path, threading, datetime
 from datetime import datetime
 import requests
 from dotenv import dotenv_values
@@ -78,4 +78,4 @@ def get_door_pwd():
             return f.read().splitlines()[0]
     else:
         logger(f"Passwd file '{file}' was not found. Using default passwd.")
-        return controllerConfig.DoorPassword
+        return config.DoorPassword

@@ -52,6 +52,8 @@ def addLogEntry():
 
 
 if __name__ == '__main__':
+    if (debug):
+        write("config from dotenv: " + jsonify(config, 'loggerService.py'))
     msg= f'Starting logger service from {fileName} '
     msg=msg + "(debug: " + str(debug) + ")!"
     write(msg, fileName)
