@@ -16,6 +16,8 @@ for k, v in config.items():
         config[k] = False
     elif v == 'True':
         config[k] = True
+    elif str(int(config[k])) == config[k]:
+        config[k] = int(config[k]
 
 print("Config loaded: " + str(len(config)) + " items.")
 line = 1

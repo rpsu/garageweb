@@ -90,7 +90,6 @@ status)
   else
     echo "${F} is not running."
   fi
-
   ;;
 
 restart)
