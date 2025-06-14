@@ -6,8 +6,6 @@ config = {
     **dotenv_values(".env.default"),  # load what came with the repo
     **dotenv_values(".env"),  # load overrides from the local
 }
-fileName = os.path.basename(__file__)
-debug = config.get("DEBUG", True)
 
 for k, v in config.items():
     if v == 'False':
@@ -16,6 +14,10 @@ for k, v in config.items():
         config[k] = True
     elif re.search("\d", config.get(k)) is not None:
         config[k] = int(config[k])
+
+fileName = os.path.basename(__file__)
+debug = config.get("DEBUG", False)
+
 if debug:
     print("Config in ${fileName}: ")
     for k, v in config.items():
