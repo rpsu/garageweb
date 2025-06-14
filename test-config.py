@@ -15,7 +15,8 @@ print("Config loaded: " + str(config.__sizeof__) + " items.")
 line = 1
 for k, v in config.items():
     print(str(line) + ": " + str(k) + " => [" + str(type(v)) + "] " + str(v))
-    v=json.loads(v)
+    if (bool(v)):
+        v=json.loads(v)
     print(str(line) + ": " + str(k) + " => [" + str(type(v)) + "] " + str(v))
     line = line + 1
 
