@@ -1,8 +1,8 @@
-import atexit, signal, time, os.path, requests, datetime
+import atexit, signal, time, os.path, requests, datetime, sys, traceback, re
 import RPi.GPIO as GPIO
 from flask import Flask, json, jsonify
 from dotenv import dotenv_values
-import sys, traceback
+
 from webUtils import logger
 
 # Load .env files
@@ -18,7 +18,7 @@ for k, v in config.items():
         config[k] = False
     elif v == 'True':
         config[k] = True
-    elif str(int(config[k])) == config[k]:
+    elif re.search("\d", config.get(k)) is not None:
         config[k] = int(config[k])
 if debug:
     print("Config in ${fileName}: ")

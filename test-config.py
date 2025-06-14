@@ -1,7 +1,6 @@
-import os.path
+import os.path, re
 from datetime import datetime
 from dotenv import dotenv_values
-import json
 
 print("File: " + os.path.basename(__file__))
 print("Time: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
@@ -16,7 +15,7 @@ for k, v in config.items():
         config[k] = False
     elif v == 'True':
         config[k] = True
-    elif str(int(config[k])) == config[k]:
+    elif re.search("\d", config.get(k)) is not None:
         config[k] = int(config[k])
 
 print("Config loaded: " + str(len(config)) + " items.")

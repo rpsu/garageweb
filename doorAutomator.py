@@ -1,5 +1,4 @@
-import  math, time, os.path, datetime
-import requests
+import  math, time, os.path, datetime, requests, re
 from dotenv import dotenv_values
 
 # Load .env files
@@ -15,7 +14,7 @@ for k, v in config.items():
         config[k] = False
     elif v == 'True':
         config[k] = True
-    elif str(int(config[k])) == config[k]:
+    elif re.search("\d", config.get(k)) is not None:
         config[k] = int(config[k])
 if debug:
     print("Config in ${fileName}: ")

@@ -1,4 +1,4 @@
-import os.path, json
+import os.path, json, re
 from flask import Flask, url_for, request, Response, make_response, redirect
 from dotenv import dotenv_values
 
@@ -17,7 +17,7 @@ for k, v in config.items():
         config[k] = False
     elif v == 'True':
         config[k] = True
-    elif str(int(config[k])) == config[k]:
+    elif re.search("\d", config.get(k)) is not None:
         config[k] = int(config[k])
 if debug:
     print("Config in ${fileName}: ")
