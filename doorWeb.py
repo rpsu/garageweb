@@ -17,12 +17,14 @@ for k, v in config.items():
         config[k] = False
     elif v == 'True':
         config[k] = True
+    elif str(int(config[k])) == config[k]:
+        config[k] = int(config[k]
 if debug:
     print("Config in ${fileName}: ")
     for k, v in config.items():
         print(str(k) + " => [" + str(type(v)) + "] " + str(v))
 
-API_CONTROLLER = "http://127.0.0.1:" + config.get("API_CONTROLLER_PORT")
+API_CONTROLLER = "http://127.0.0.1:" + str(config.get("API_CONTROLLER_PORT"))
 
 # Door state constants.
 STATE_UP = config.get("STATE_UP")
@@ -33,7 +35,7 @@ STATE_BETWEEN = config.get("STATE_BETWEEN")
 # with no further configuration.
 app = Flask(__name__, static_url_path='/static')
 listen_to_ip = '0.0.0.0'
-listen_to_port = config.get("API_WEB_PORT")
+listen_to_port = str(config.get("API_WEB_PORT"))
 
 # Routes are in webUtils.
 

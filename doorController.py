@@ -18,6 +18,8 @@ for k, v in config.items():
         config[k] = False
     elif v == 'True':
         config[k] = True
+    elif str(int(config[k])) == config[k]:
+        config[k] = int(config[k]
 if debug:
     print("Config in ${fileName}: ")
     for k, v in config.items():
@@ -29,7 +31,7 @@ API_LOGGER = "http://127.0.0.1:" + config.get("API_LOGGER_PORT")
 # with no further configuration.
 app = Flask(__name__)
 listen_to_ip = '127.0.0.1'
-listen_to_port = config.get("API_CONTROLLER_PORT")
+listen_to_port = str(config.get("API_CONTROLLER_PORT"))
 
 GPIO_SETUP = False
 

@@ -16,13 +16,15 @@ for k, v in config.items():
         config[k] = False
     elif v == 'True':
         config[k] = True
+    elif str(int(config[k])) == config[k]:
+        config[k] = int(config[k]
 if debug:
     print("Config in ${fileName}: ")
     for k, v in config.items():
         print(str(k) + " => [" + str(type(v)) + "] " + str(v))
 
-API_CONTROLLER = "http://127.0.0.1:" + config.get("API_CONTROLLER_PORT")
-API_LOGGER = "http://127.0.0.1:" + config.get("API_LOGGER_PORT")
+API_CONTROLLER = "http://127.0.0.1:" + str(config.get("API_CONTROLLER_PORT"))
+API_LOGGER = "http://127.0.0.1:" + str(config.get("API_LOGGER_PORT"))
 
 # APIs, Logger API
 def logger(msg):
