@@ -7,14 +7,19 @@ config = {
     **dotenv_values(".env.default"),  # load what came with the repo
     **dotenv_values(".env"),  # load overrides from the local
 }
+fileName = os.path.basename(__file__)
+
 for k, v in config.items():
     if v == 'False':
         config[k] = False
     elif v == 'True':
         config[k] = True
+if "DEGUG" in config or config["DEBUG"] == True or config["DEBUG"] == None:
+    print("Config in ${fileName}: ")
+    for k, v in config.items():
+        print(str(k) + " => [" + str(type(v)) + "] " + str(v))
 
 debug = config["DEBUG"]
-fileName = os.path.basename(__file__)
 
 API_CONTROLLER = "http://127.0.0.1:" + config["API_CONTROLLER_PORT"]
 API_LOGGER = "http://127.0.0.1:" + config["API_LOGGER_PORT"]
