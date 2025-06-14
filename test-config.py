@@ -11,7 +11,7 @@ config = {
     **dotenv_values(".env.default"),  # load what came with the repo
     **dotenv_values(".env"),  # load overrides from the local
 }
-print("Config loaded: " + str(config.__len__) + " items.")
+print("Config loaded: " + str(config.__sizeof__) + " items.")
 print("config from dotenv: " + jsonify(config))
 print("Done.")
 
