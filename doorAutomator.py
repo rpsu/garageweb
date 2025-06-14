@@ -22,7 +22,7 @@ STATE_UP = config.STATE_UP
 STATE_DOWN = config.STATE_DOWN
 STATE_BETWEEN = config.STATE_BETWEEN
 
-debug = config.DEBUGGING
+debug = config.DEBUG
 
 # Close door automatically after seconds (if left fully opened)
 DoorAutoCloseDelay = 360

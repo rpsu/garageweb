@@ -4,8 +4,6 @@ from datetime import datetime
 
 print("Control + C to exit Program")
 
-VerboseConsole = True
-
 # Swithces "door is up" and "door is down".
 SWITCH_UPPER = 18
 SWITCH_LOWER = 16

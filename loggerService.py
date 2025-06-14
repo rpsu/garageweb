@@ -16,8 +16,7 @@ for k, v in config.items():
 
 
 fileName = os.path.basename(__file__)
-verboseConsole = config.DEBUGGING
-debug = config.DEBUGGING
+debug=config.DEBUG
 
 lock = threading.Lock()
 logFilePath = "/home/pi/GarageWeb/static/log.txt"
@@ -26,7 +25,7 @@ listen_to_ip = '127.0.0.1'
 listen_to_port = config.API_LOGGER_PORT
 
 def write(msg, fileName):
-    global verboseConsole, logFilePath
+    global debug, logFilePath
 
     with lock:
         try:
@@ -35,7 +34,7 @@ def write(msg, fileName):
           charsWritten = logfile.write(msg)
           logfile.close()
 
-          if verboseConsole:
+          if debug:
               print(msg)
           if charsWritten < len(msg):
               raise Exception('Mismatch in msg len provided and written')
