@@ -1,6 +1,7 @@
 import os.path
 from datetime import datetime
 from dotenv import dotenv_values
+import json
 
 print("File: " + os.path.basename(__file__))
 print("Time: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
@@ -13,6 +14,8 @@ config = {
 print("Config loaded: " + str(config.__sizeof__) + " items.")
 line = 1
 for k, v in config.items():
+    print(str(line) + ": " + str(k) + " => [" + str(type(v)) + "] " + str(v))
+    v=json.loads(v)
     print(str(line) + ": " + str(k) + " => [" + str(type(v)) + "] " + str(v))
     line = line + 1
 
