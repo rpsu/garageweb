@@ -2,13 +2,17 @@ import os.path, re
 from datetime import datetime
 from dotenv import dotenv_values
 
+dir = os.path.curdir
+print("Dir: " + dir)
+dir = os.path.dirname(__file__)
+print("Dir: " + dir)
 print("File: " + os.path.basename(__file__))
 print("Time: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 print("Loading config.")
 # Load .env files
 config = {
-    **dotenv_values(".env.default"),  # load what came with the repo
-    **dotenv_values(".env"),  # load overrides from the local
+    **dotenv_values(dir + ".env.default"),  # load what came with the repo
+    **dotenv_values(dir + ".env"),  # load overrides from the local
 }
 for k, v in config.items():
     if v == 'False':
