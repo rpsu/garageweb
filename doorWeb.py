@@ -1,22 +1,29 @@
 import os.path, json
 from flask import Flask, url_for, request, Response, make_response, redirect
+from dotenv import dotenv_values
 
 from webUtils import logger, user_ip_address, get_door_pwd, getStatus, openDoor, closeDoor, toggleDoor
 
+# Load .env files
+config = {
+    **dotenv_values(".env.default"),  # load what came with the repo
+    **dotenv_values(".env"),  # load overrides from the local
+}
+
 fileName = os.path.basename(__file__)
-API_CONTROLLER = "http://127.0.0.1:5080"
-debug = False
+API_CONTROLLER = "http://127.0.0.1:${config.API_CONTROLLER_PORT}"
+debug = config.DEBUGGING
 
 # Door state constants.
-STATE_UP = 'up'
-STATE_DOWN = 'down'
-STATE_BETWEEN = 'between'
+STATE_UP = config.STATE_UP
+STATE_DOWN = config.STATE_DOWN
+STATE_BETWEEN = config.STATE_BETWEEN
 
 # With static_url_path Flask serves all assets under the /static
 # with no further configuration.
 app = Flask(__name__, static_url_path='/static')
 listen_to_ip = '0.0.0.0'
-listen_to_port = 5000
+listen_to_port = config.API_WEB_PORT
 
 # Routes are in webUtils.
 
@@ -115,4 +122,4 @@ if __name__ == '__main__':
     msg = f'Hello from {fileName} '
     msg = msg + "(debug: " + str(debug) + ")!"
     logger(msg)
-    app.run(host=listen_to_ip, port=listen_to_port, debug=debug )
+    app.run(host=listen_to_ip, port=listen_to_port, debug="${debug}" )

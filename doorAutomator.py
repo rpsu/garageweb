@@ -1,14 +1,21 @@
 import  math, time, os.path, datetime
 import requests
+from dotenv import dotenv_values
+
+# Load .env files
+config = {
+    **dotenv_values(".env.default"),  # load what came with the repo
+    **dotenv_values(".env"),  # load overrides from the local
+}
 
 fileName = os.path.basename(__file__)
-API_CONTROLLER = "http://127.0.0.1:5080"
-API_LOGGER = "http://127.0.0.1:5081"
+API_CONTROLLER = "http://127.0.0.1:${config.API_CONTROLLER_PORT}"
+API_LOGGER = "http://127.0.0.1:${config.API_LOGGER_PORT}"
 
 # Door state constants.
-STATE_UP = 'up'
-STATE_DOWN = 'down'
-STATE_BETWEEN = 'between'
+STATE_UP = config.STATE_UP
+STATE_DOWN = config.STATE_DOWN
+STATE_BETWEEN = config.STATE_BETWEEN
 
 debug = False
 

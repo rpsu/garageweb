@@ -5,3 +5,4 @@ webstreaming.py
 cam/
 motion_detection/
 env/
+.env

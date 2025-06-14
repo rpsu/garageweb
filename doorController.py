@@ -1,25 +1,32 @@
-import atexit, signal, time, controllerConfig, os.path, requests, datetime
+import atexit, signal, time, os.path, requests, datetime
 import RPi.GPIO as GPIO
 from flask import Flask, json, jsonify
+from dotenv import dotenv_values
+import sys, traceback
+from webUtils import logger
 
-debug=controllerConfig.DEBUGGING
+# Load .env files
+config = {
+    **dotenv_values(".env.default"),  # load what came with the repo
+    **dotenv_values(".env"),  # load overrides from the local
+}
+
+debug=config.DEBUGGING
 
 fileName = os.path.basename(__file__)
 
-API_LOGGER = "http://127.0.0.1:5081"
+API_LOGGER = "http://127.0.0.1:${config.API_LOGGER_PORT}"
 
 # With static_url_path Flask serves all assets under the /static
 # with no further configuration.
 app = Flask(__name__)
 listen_to_ip = '127.0.0.1'
-listen_to_port = 5080
+listen_to_port = config.API_CONTROLLER_PORT
 
-from webUtils import logger
 
 fileName = os.path.basename(__file__)
 
 GPIO_SETUP = False
-
 
 def logger(msg):
     if type(msg) == str and len(msg) > 0:
@@ -30,6 +37,7 @@ def logger(msg):
 
 # Shutdown and cleanup, then register the function right below.
 def shutdown(*args):
+    traceback.print_exc(file=sys.stdout)
     global GPIO_SETUP
     logger("GPIO shutdown() called with: " + ', '.join(args))
     if GPIO_SETUP:
@@ -45,6 +53,7 @@ signal.signal(signal.SIGINT, lambda s, f: exit(0))
 signal.signal(signal.SIGTERM, lambda s, f: exit(0))
 
 def setup(initializer):
+    traceback.print_exc(file=sys.stdout)
     global GPIO_SETUP
     if GPIO_SETUP:  # Check if already set up
         logger("Init already done, skipping from " + initializer)
@@ -61,17 +70,17 @@ def setup(initializer):
 
     # Set up the PINs as an input with a pull-up resistor.
     # These will monitor door state.
-    GPIO.setup(controllerConfig.SWITCH_UPPER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(controllerConfig.SWITCH_LOWER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(config.SWITCH_UPPER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(config.SWITCH_LOWER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     # Setup OPEN & CLOSE relay control. The output
     # must be set right after in order to the relay not
     # be set with a wrong value (LOW).
-    GPIO.setup(controllerConfig.PINS_BUTTON_OPEN, GPIO.OUT)
-    GPIO.output(controllerConfig.PINS_BUTTON_OPEN, GPIO.HIGH)
-    if controllerConfig.PINS_BUTTON_OPEN != controllerConfig.PINS_BUTTON_CLOSE:
-        GPIO.setup(controllerConfig.PINS_BUTTON_CLOSE, GPIO.OUT)
-        GPIO.output(controllerConfig.PINS_BUTTON_OPEN, GPIO.HIGH)
+    GPIO.setup(config.PINS_BUTTON_OPEN, GPIO.OUT)
+    GPIO.output(config.PINS_BUTTON_OPEN, GPIO.HIGH)
+    if config.PINS_BUTTON_OPEN != config.PINS_BUTTON_CLOSE:
+        GPIO.setup(config.PINS_BUTTON_CLOSE, GPIO.OUT)
+        GPIO.output(config.PINS_BUTTON_OPEN, GPIO.HIGH)
 
     GPIO_SETUP=True
     logger("Setting up GPIO Pins ... done!")
@@ -81,23 +90,23 @@ def setup(initializer):
 @app.route('/close', methods=['GET'])
 def close():
     msg = "Garage door route /close called "
-    if controllerConfig.DRY_RUN:
+    if config.DRY_RUN:
         msg = "** DRY RUN ONLY ** " + msg
     logger(msg)
     msg = "Toggling RasPi pins @ " + datetime.datetime.now().strftime("%X")
-    if controllerConfig.DRY_RUN:
+    if config.DRY_RUN:
         msg = "** DRY RUN ONLY ** " + msg
     logger(msg)
     if(debug):
         logGPIOStatuses()
-    GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.LOW)
-    msg = "Toggling RasPi pins [" + str(GPIO.input(controllerConfig.PINS_BUTTON_CLOSE)) + "] @ " + datetime.datetime.now().strftime("%X")
+    GPIO.output(config.PINS_BUTTON_CLOSE, GPIO.LOW)
+    msg = "Toggling RasPi pins [" + str(GPIO.input(config.PINS_BUTTON_CLOSE)) + "] @ " + datetime.datetime.now().strftime("%X")
     logger(msg)
     time.sleep(.5)
     if(debug):
         logGPIOStatuses()
-    GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.HIGH)
-    msg = "Toggling RasPi pins [" + str(GPIO.input(controllerConfig.PINS_BUTTON_CLOSE)) + "] @ " + datetime.datetime.now().strftime("%X")
+    GPIO.output(config.PINS_BUTTON_CLOSE, GPIO.HIGH)
+    msg = "Toggling RasPi pins [" + str(GPIO.input(config.PINS_BUTTON_CLOSE)) + "] @ " + datetime.datetime.now().strftime("%X")
     logger(msg)
     if(debug):
         logGPIOStatuses()
@@ -108,16 +117,16 @@ def close():
 @app.route('/open', methods=['GET'])
 def open():
     msg = "Garage door route /open called "
-    if controllerConfig.DRY_RUN:
+    if config.DRY_RUN:
         msg = "** DRY RUN ONLY ** " + msg
     logger(msg)
     if(debug):
         logGPIOStatuses()
-    GPIO.output(controllerConfig.PINS_BUTTON_OPEN, GPIO.LOW)
+    GPIO.output(config.PINS_BUTTON_OPEN, GPIO.LOW)
     time.sleep(.5)
     if(debug):
         logGPIOStatuses()
-    GPIO.output(controllerConfig.PINS_BUTTON_OPEN, GPIO.HIGH)
+    GPIO.output(config.PINS_BUTTON_OPEN, GPIO.HIGH)
     if(debug):
         logGPIOStatuses()
     return jsonify({'message': 'success'}), 200
@@ -125,16 +134,16 @@ def open():
 def logGPIOStatuses():
     msg = "Statuses:: "
     msg = msg + "Button: "
-    if GPIO.input(controllerConfig.PINS_BUTTON_OPEN) == GPIO.HIGH:
+    if GPIO.input(config.PINS_BUTTON_OPEN) == GPIO.HIGH:
       msg = msg + " down/pressed"
     else:
       msg = msg + " up/unpressed"
     msg = ". Switches: "
-    if GPIO.input(controllerConfig.SWITCH_LOWER) == GPIO.HIGH:
+    if GPIO.input(config.SWITCH_LOWER) == GPIO.HIGH:
       msg = msg + " lower is open"
     else:
       msg = msg + " lower is closed"
-    if GPIO.input(controllerConfig.SWITCH_UPPER) == GPIO.HIGH:
+    if GPIO.input(config.SWITCH_UPPER) == GPIO.HIGH:
       msg = msg + " upper is open"
     else:
       msg = msg + " upper is closed"
@@ -143,21 +152,21 @@ def logGPIOStatuses():
 # Read door status from magnetic switches connected to GPIO
 @app.route('/status', methods=['GET'])
 def status():
-    if GPIO.input(controllerConfig.SWITCH_LOWER) == GPIO.HIGH and GPIO.input(controllerConfig.SWITCH_UPPER) == GPIO.HIGH:
-        if controllerConfig.LogLevel >= 1:
+    if GPIO.input(config.SWITCH_LOWER) == GPIO.HIGH and GPIO.input(config.SWITCH_UPPER) == GPIO.HIGH:
+        if config.LogLevel >= 1:
             logger("Garage is Opening/Closing")
-        return jsonify({"door": f"{controllerConfig.STATE_BETWEEN}"}), 200
+        return jsonify({"door": f"{config.STATE_BETWEEN}"}), 200
 
     else:
-        if GPIO.input(controllerConfig.SWITCH_LOWER) == GPIO.LOW:
-            if controllerConfig.LogLevel >= 2:
+        if GPIO.input(config.SWITCH_LOWER) == GPIO.LOW:
+            if config.LogLevel >= 2:
                 logger("Garage is Closed")
-            return jsonify({"door": f"{controllerConfig.STATE_DOWN}"}), 200
+            return jsonify({"door": f"{config.STATE_DOWN}"}), 200
 
-        if GPIO.input(controllerConfig.SWITCH_UPPER) == GPIO.LOW:
-            if controllerConfig.LogLevel >= 1:
+        if GPIO.input(config.SWITCH_UPPER) == GPIO.LOW:
+            if config.LogLevel >= 1:
                 logger("Door is Open")
-            return jsonify({"door": f"{controllerConfig.STATE_UP}"}), 200
+            return jsonify({"door": f"{config.STATE_UP}"}), 200
     return jsonify({"door": "?"}), 523
 
 
@@ -167,6 +176,6 @@ if __name__ == '__main__':
         msg = msg + "(debug: " + str(debug) + ")!"
         logger(msg)
         setup(fileName)
-        app.run(host=listen_to_ip, port=listen_to_port, debug=debug )
+        app.run(host=listen_to_ip, port=listen_to_port, debug="${debug}")
     finally:
         shutdown(json.dumps({"from": "flask.exit"}))

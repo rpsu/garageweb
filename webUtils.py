@@ -1,11 +1,18 @@
 import controllerConfig, os.path, threading, datetime
 from datetime import datetime
 import requests
+from dotenv import dotenv_values
+
+# Load .env files
+config = {
+    **dotenv_values(".env.default"),  # load what came with the repo
+    **dotenv_values(".env"),  # load overrides from the local
+}
 
 fileName = os.path.basename(__file__)
 
-API_LOGGER = "http://127.0.0.1:5081"
-API_CONTROLLER = "http://127.0.0.1:5080"
+API_CONTROLLER = "http://127.0.0.1:${config.API_CONTROLLER_PORT}"
+API_LOGGER = "http://127.0.0.1:${config.API_LOGGER_PORT}"
 
 
 # APIs, Logger API
