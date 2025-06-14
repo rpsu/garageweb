@@ -11,29 +11,25 @@ config = {
     **dotenv_values(".env"),  # load overrides from the local
 }
 fileName = os.path.basename(__file__)
+debug = config.get("DEBUG", True)
 
 for k, v in config.items():
     if v == 'False':
-        config[k] = False
+        config.get(k] = False
     elif v == 'True':
-        config[k] = True
-if "DEGUG" in config or config["DEBUG"] == True or config["DEBUG"] == None:
+        config.get(k] = True
+if debug:
     print("Config in ${fileName}: ")
     for k, v in config.items():
         print(str(k) + " => [" + str(type(v)) + "] " + str(v))
 
-
-debug = config["DEBUG"]
-
-API_LOGGER = "http://127.0.0.1:" + config["API_LOGGER_PORT"]
+API_LOGGER = "http://127.0.0.1:" + config.get("API_LOGGER_PORT")
 
 # With static_url_path Flask serves all assets under the /static
 # with no further configuration.
 app = Flask(__name__)
 listen_to_ip = '127.0.0.1'
-listen_to_port = config["API_CONTROLLER_PORT"]
-
-fileName = os.path.basename(__file__)
+listen_to_port = config.get("API_CONTROLLER_PORT")
 
 GPIO_SETUP = False
 
@@ -79,17 +75,17 @@ def setup(initializer):
 
     # Set up the PINs as an input with a pull-up resistor.
     # These will monitor door state.
-    GPIO.setup(config["SWITCH_UPPER"], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(config["SWITCH_LOWER"], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(config.get("SWITCH_UPPER"), GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(config.get("SWITCH_LOWER"), GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     # Setup OPEN & CLOSE relay control. The output
     # must be set right after in order to the relay not
     # be set with a wrong value (LOW).
-    GPIO.setup(config["PINS_BUTTON_OPEN"], GPIO.OUT)
-    GPIO.output(config["PINS_BUTTON_OPEN"], GPIO.HIGH)
-    if config["PINS_BUTTON_OPEN"] != config["PINS_BUTTON_CLOSE"]:
-        GPIO.setup(config["PINS_BUTTON_CLOSE"], GPIO.OUT)
-        GPIO.output(config["PINS_BUTTON_OPEN"], GPIO.HIGH)
+    GPIO.setup(config.get("PINS_BUTTON_OPEN"), GPIO.OUT)
+    GPIO.output(config.get("PINS_BUTTON_OPEN"), GPIO.HIGH)
+    if config.get("PINS_BUTTON_OPEN") != config.get("PINS_BUTTON_CLOSE"):
+        GPIO.setup(config.get("PINS_BUTTON_CLOSE"), GPIO.OUT)
+        GPIO.output(config.get("PINS_BUTTON_OPEN"), GPIO.HIGH)
 
     GPIO_SETUP=True
     logger("Setting up GPIO Pins ... done!")
@@ -99,23 +95,23 @@ def setup(initializer):
 @app.route('/close', methods=['GET'])
 def close():
     msg = "Garage door route /close called "
-    if config["DRY_RUN"]:
+    if config.get("DRY_RUN"):
         msg = "** DRY RUN ONLY ** " + msg
     logger(msg)
     msg = "Toggling RasPi pins @ " + datetime.datetime.now().strftime("%X")
-    if config["DRY_RUN"]:
+    if config.get("DRY_RUN"):
         msg = "** DRY RUN ONLY ** " + msg
     logger(msg)
     if(debug):
         logGPIOStatuses()
-    GPIO.output(config["PINS_BUTTON_CLOSE"], GPIO.LOW)
-    msg = "Toggling RasPi pins [" + str(GPIO.input(config["PINS_BUTTON_CLOSE"])) + "] @ " + datetime.datetime.now().strftime("%X")
+    GPIO.output(config.get("PINS_BUTTON_CLOSE"), GPIO.LOW)
+    msg = "Toggling RasPi pins [" + str(GPIO.input(config.get("PINS_BUTTON_CLOSE"))) + "] @ " + datetime.datetime.now().strftime("%X")
     logger(msg)
     time.sleep(.5)
     if(debug):
         logGPIOStatuses()
-    GPIO.output(config["PINS_BUTTON_CLOSE"], GPIO.HIGH)
-    msg = "Toggling RasPi pins [" + str(GPIO.input(config["PINS_BUTTON_CLOSE"])) + "] @ " + datetime.datetime.now().strftime("%X")
+    GPIO.output(config.get("PINS_BUTTON_CLOSE"), GPIO.HIGH)
+    msg = "Toggling RasPi pins [" + str(GPIO.input(config.get("PINS_BUTTON_CLOSE"))) + "] @ " + datetime.datetime.now().strftime("%X")
     logger(msg)
     if(debug):
         logGPIOStatuses()
@@ -126,16 +122,16 @@ def close():
 @app.route('/open', methods=['GET'])
 def open():
     msg = "Garage door route /open called "
-    if config["DRY_RUN"]:
+    if config.get("DRY_RUN"):
         msg = "** DRY RUN ONLY ** " + msg
     logger(msg)
     if(debug):
         logGPIOStatuses()
-    GPIO.output(config["PINS_BUTTON_OPEN"], GPIO.LOW)
+    GPIO.output(config.get("PINS_BUTTON_OPEN"), GPIO.LOW)
     time.sleep(.5)
     if(debug):
         logGPIOStatuses()
-    GPIO.output(config["PINS_BUTTON_OPEN"], GPIO.HIGH)
+    GPIO.output(config.get("PINS_BUTTON_OPEN"), GPIO.HIGH)
     if(debug):
         logGPIOStatuses()
     return jsonify({'message': 'success'}), 200
@@ -143,16 +139,16 @@ def open():
 def logGPIOStatuses():
     msg = "Statuses:: "
     msg = msg + "Button: "
-    if GPIO.input(config["PINS_BUTTON_OPEN"]) == GPIO.HIGH:
+    if GPIO.input(config.get("PINS_BUTTON_OPEN")) == GPIO.HIGH:
       msg = msg + " down/pressed"
     else:
       msg = msg + " up/unpressed"
     msg = ". Switches: "
-    if GPIO.input(config["SWITCH_LOWER"]) == GPIO.HIGH:
+    if GPIO.input(config.get("SWITCH_LOWER")) == GPIO.HIGH:
       msg = msg + " lower is open"
     else:
       msg = msg + " lower is closed"
-    if GPIO.input(config["SWITCH_UPPER"]) == GPIO.HIGH:
+    if GPIO.input(config.get("SWITCH_UPPER")) == GPIO.HIGH:
       msg = msg + " upper is open"
     else:
       msg = msg + " upper is closed"
@@ -161,21 +157,21 @@ def logGPIOStatuses():
 # Read door status from magnetic switches connected to GPIO
 @app.route('/status', methods=['GET'])
 def status():
-    if GPIO.input(config["SWITCH_LOWER"]) == GPIO.HIGH and GPIO.input(config["SWITCH_UPPER"]) == GPIO.HIGH:
-        if config["LogLevel >= 1:
+    if GPIO.input(config.get("SWITCH_LOWER")) == GPIO.HIGH and GPIO.input(config.get("SWITCH_UPPER")) == GPIO.HIGH:
+        if config.get("LogLevel >= 1:
             logger("Garage is Opening/Closing")
-        return jsonify({"door": config["STATE_BETWEEN"]}), 200
+        return jsonify({"door": config.get("STATE_BETWEEN")}), 200
 
     else:
-        if GPIO.input(config["SWITCH_LOWER) == GPIO.LOW:
-            if config["LogLevel >= 2:
+        if GPIO.input(config.get("SWITCH_LOWER) == GPIO.LOW:
+            if config.get("LogLevel >= 2:
                 logger("Garage is Closed")
-            return jsonify({"door": config["STATE_DOWN"]}), 200
+            return jsonify({"door": config.get("STATE_DOWN")}), 200
 
-        if GPIO.input(config["SWITCH_UPPER) == GPIO.LOW:
-            if config["LogLevel >= 1:
+        if GPIO.input(config.get("SWITCH_UPPER) == GPIO.LOW:
+            if config.get("LogLevel >= 1:
                 logger("Door is Open")
-            return jsonify({"door": config["STATE_UP"]}), 200
+            return jsonify({"door": config.get("STATE_UP")}), 200
     return jsonify({"door": "?"}), 523
 
 

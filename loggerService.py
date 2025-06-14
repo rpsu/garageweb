@@ -9,24 +9,23 @@ config = {
     **dotenv_values(".env"),  # load overrides from the local
 }
 fileName = os.path.basename(__file__)
+debug = config.get("DEBUG", True)
 
 for k, v in config.items():
     if v == 'False':
         config[k] = False
     elif v == 'True':
         config[k] = True
-if "DEGUG" in config or config["DEBUG"] == True or config["DEBUG"] == None:
+if debug:
     print("Config in ${fileName}: ")
     for k, v in config.items():
         print(str(k) + " => [" + str(type(v)) + "] " + str(v))
-
-debug = config["DEBUG"]
 
 lock = threading.Lock()
 logFilePath = "/home/pi/GarageWeb/static/log.txt"
 app = Flask(__name__)
 listen_to_ip = '127.0.0.1'
-listen_to_port = config["API_LOGGER_PORT"]
+listen_to_port = config.get("API_LOGGER_PORT")
 
 def write(msg, fileName):
     global debug, logFilePath

@@ -8,26 +8,25 @@ config = {
     **dotenv_values(".env"),  # load overrides from the local
 }
 fileName = os.path.basename(__file__)
+debug = config.get("DEBUG", True)
 
 for k, v in config.items():
     if v == 'False':
-        config[k] = False
+        config.get(k] = False
     elif v == 'True':
-        config[k] = True
-if "DEGUG" in config or config["DEBUG"] == True or config["DEBUG"] == None:
+        config.get(k] = True
+if debug:
     print("Config in ${fileName}: ")
     for k, v in config.items():
         print(str(k) + " => [" + str(type(v)) + "] " + str(v))
 
-debug = config["DEBUG"]
-
-API_CONTROLLER = "http://127.0.0.1:" + config["API_CONTROLLER_PORT"]
-API_LOGGER = "http://127.0.0.1:" + config["API_LOGGER_PORT"]
+API_CONTROLLER = "http://127.0.0.1:" + config.get("API_CONTROLLER_PORT")
+API_LOGGER = "http://127.0.0.1:" + config.get("API_LOGGER_PORT")
 
 # Door state constants.
-STATE_UP = config["STATE_UP"]
-STATE_DOWN = config["STATE_DOWN"]
-STATE_BETWEEN = config["STATE_BETWEEN"]
+STATE_UP = config.get("STATE_UP")
+STATE_DOWN = config.get("STATE_DOWN")
+STATE_BETWEEN = config.get("STATE_BETWEEN")
 
 
 # Close door automatically after seconds (if left fully opened)

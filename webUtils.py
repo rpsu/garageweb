@@ -9,21 +9,20 @@ config = {
     **dotenv_values(".env"),  # load overrides from the local
 }
 fileName = os.path.basename(__file__)
+debug = config.get("DEBUG", True)
 
 for k, v in config.items():
     if v == 'False':
         config[k] = False
     elif v == 'True':
         config[k] = True
-if "DEGUG" in config or config["DEBUG"] == True or config["DEBUG"] == None:
+if debug:
     print("Config in ${fileName}: ")
     for k, v in config.items():
         print(str(k) + " => [" + str(type(v)) + "] " + str(v))
 
-
-
-API_CONTROLLER = "http://127.0.0.1:" + config["API_CONTROLLER_PORT"]
-API_LOGGER = "http://127.0.0.1:" + config["API_LOGGER_PORT"]
+API_CONTROLLER = "http://127.0.0.1:" + config.get("API_CONTROLLER_PORT")
+API_LOGGER = "http://127.0.0.1:" + config.get("API_LOGGER_PORT")
 
 # APIs, Logger API
 def logger(msg):
@@ -78,4 +77,4 @@ def user_ip_address(request):
 
 # Get current password from a file.
 def get_door_pwd():
-    return config["DoorPassword"]
+    return config.get("DoorPassword")
