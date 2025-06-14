@@ -80,7 +80,7 @@ def setup(initializer):
 # This triggers the Opening/Closing the door.
 @app.route('/close', methods=['GET'])
 def close():
-    msg = "Garage door close route called "
+    msg = "Garage door route /close called "
     if controllerConfig.DRY_RUN:
         msg = "** DRY RUN ONLY ** " + msg
     logger(msg)
@@ -88,28 +88,57 @@ def close():
     if controllerConfig.DRY_RUN:
         msg = "** DRY RUN ONLY ** " + msg
     logger(msg)
+    if(debug):
+        logGPIOStatuses()
     GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.LOW)
     msg = "Toggling RasPi pins [" + str(GPIO.input(controllerConfig.PINS_BUTTON_CLOSE)) + "] @ " + datetime.datetime.now().strftime("%X")
     logger(msg)
     time.sleep(.5)
+    if(debug):
+        logGPIOStatuses()
     GPIO.output(controllerConfig.PINS_BUTTON_CLOSE, GPIO.HIGH)
     msg = "Toggling RasPi pins [" + str(GPIO.input(controllerConfig.PINS_BUTTON_CLOSE)) + "] @ " + datetime.datetime.now().strftime("%X")
     logger(msg)
+    if(debug):
+        logGPIOStatuses()
     return jsonify({'message': 'success'}), 200
 
 
 # This triggers the Opening/Closing the door.
 @app.route('/open', methods=['GET'])
 def open():
-    msg = "Garage door opening triggered "
+    msg = "Garage door route /open called "
     if controllerConfig.DRY_RUN:
         msg = "** DRY RUN ONLY ** " + msg
     logger(msg)
+    if(debug):
+        logGPIOStatuses()
     GPIO.output(controllerConfig.PINS_BUTTON_OPEN, GPIO.LOW)
     time.sleep(.5)
+    if(debug):
+        logGPIOStatuses()
     GPIO.output(controllerConfig.PINS_BUTTON_OPEN, GPIO.HIGH)
+    if(debug):
+        logGPIOStatuses()
     return jsonify({'message': 'success'}), 200
 
+def logGPIOStatuses():
+    msg = "Statuses:: "
+    msg = msg + "Button: "
+    if GPIO.input(controllerConfig.PINS_BUTTON_OPEN) == GPIO.HIGH:
+      msg = msg + " down/pressed"
+    else:
+      msg = msg + " up/unpressed"
+    msg = ". Switches: "
+    if GPIO.input(controllerConfig.SWITCH_LOWER) == GPIO.HIGH:
+      msg = msg + " lower is open"
+    else:
+      msg = msg + " lower is closed"
+    if GPIO.input(controllerConfig.SWITCH_UPPER) == GPIO.HIGH:
+      msg = msg + " upper is open"
+    else:
+      msg = msg + " upper is closed"
+    logger(msg)
 
 # Read door status from magnetic switches connected to GPIO
 @app.route('/status', methods=['GET'])
