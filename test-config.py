@@ -1,6 +1,5 @@
 import os.path
 from datetime import datetime
-from flask import Flask, request, jsonify
 from dotenv import dotenv_values
 
 print("File: " + os.path.basename(__file__))
@@ -14,7 +13,7 @@ config = {
 print("Config loaded: " + str(config.__sizeof__) + " items.")
 line = 1
 for k, v in config.items():
-    print("${line}: ${k} => ${v}")
+    print(line + ": " + k + " => " + v)
     line = line + 1
 
 print("Done.")
