@@ -10,6 +10,12 @@ config = {
     **dotenv_values(".env.default"),  # load what came with the repo
     **dotenv_values(".env"),  # load overrides from the local
 }
+for k, v in config.items():
+    if v == 'False':
+        config[k] = False
+    elif v == 'True':
+        config[k] = True
+
 
 debug=config.DEBUGGING
 

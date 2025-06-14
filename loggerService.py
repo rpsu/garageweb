@@ -8,6 +8,12 @@ config = {
     **dotenv_values(".env.default"),  # load what came with the repo
     **dotenv_values(".env"),  # load overrides from the local
 }
+for k, v in config.items():
+    if v == 'False':
+        config[k] = False
+    elif v == 'True':
+        config[k] = True
+
 
 fileName = os.path.basename(__file__)
 verboseConsole = config.DEBUGGING
@@ -25,7 +31,7 @@ def write(msg, fileName):
     with lock:
         try:
           logfile = open(logFilePath, "a")
-          msg = (datetime.now().strftime("%Y-%m-%d %H:%M:%S [" + fileName + "] - - " + msg + "\n"))
+          msg = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "[" + fileName + "] - - " + msg + "\n"
           charsWritten = logfile.write(msg)
           logfile.close()
 

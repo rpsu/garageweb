@@ -7,6 +7,11 @@ config = {
     **dotenv_values(".env.default"),  # load what came with the repo
     **dotenv_values(".env"),  # load overrides from the local
 }
+for k, v in config.items():
+    if v == 'False':
+        config[k] = False
+    elif v == 'True':
+        config[k] = True
 
 fileName = os.path.basename(__file__)
 API_CONTROLLER = "http://127.0.0.1:${config.API_CONTROLLER_PORT}"
@@ -17,7 +22,7 @@ STATE_UP = config.STATE_UP
 STATE_DOWN = config.STATE_DOWN
 STATE_BETWEEN = config.STATE_BETWEEN
 
-debug = False
+debug = config.DEBUGGING
 
 # Close door automatically after seconds (if left fully opened)
 DoorAutoCloseDelay = 360
