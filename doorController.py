@@ -158,18 +158,18 @@ def logGPIOStatuses():
 @app.route('/status', methods=['GET'])
 def status():
     if GPIO.input(config.get("SWITCH_LOWER")) == GPIO.HIGH and GPIO.input(config.get("SWITCH_UPPER")) == GPIO.HIGH:
-        if config.get("LogLevel >= 1:
+        if int(config.get("LogLevel")) >= 1:
             logger("Garage is Opening/Closing")
         return jsonify({"door": config.get("STATE_BETWEEN")}), 200
 
     else:
-        if GPIO.input(config.get("SWITCH_LOWER) == GPIO.LOW:
-            if config.get("LogLevel >= 2:
+        if GPIO.input(config.get("SWITCH_LOWER")) == GPIO.LOW:
+            if int(config.get("LogLevel")) >= 2:
                 logger("Garage is Closed")
             return jsonify({"door": config.get("STATE_DOWN")}), 200
 
-        if GPIO.input(config.get("SWITCH_UPPER) == GPIO.LOW:
-            if config.get("LogLevel >= 1:
+        if GPIO.input(config.get("SWITCH_UPPER")) == GPIO.LOW:
+            if int(config.get("LogLevel")) >= 1:
                 logger("Door is Open")
             return jsonify({"door": config.get("STATE_UP")}), 200
     return jsonify({"door": "?"}), 523
