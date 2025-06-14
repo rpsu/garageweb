@@ -18,7 +18,7 @@ for k, v in config.items():
     elif v == 'True':
         config[k] = True
     elif str(int(config[k])) == config[k]:
-        config[k] = int(config[k]
+        config[k] = int(config[k])
 if debug:
     print("Config in ${fileName}: ")
     for k, v in config.items():
