@@ -12,9 +12,9 @@ debug = config.get("DEBUG", True)
 
 for k, v in config.items():
     if v == 'False':
-        config.get(k] = False
+        config.get(k) = False
     elif v == 'True':
-        config.get(k] = True
+        config.get(k) = True
 if debug:
     print("Config in ${fileName}: ")
     for k, v in config.items():
