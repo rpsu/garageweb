@@ -1,5 +1,4 @@
 static/log.txt
-garage-password.txt
 *.pyc
 webstreaming.py
 cam/

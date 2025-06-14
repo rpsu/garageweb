@@ -15,21 +15,21 @@ for k, v in config.items():
     elif v == 'True':
         config[k] = True
 
-
+debug = config["DEBUG"]
 fileName = os.path.basename(__file__)
-API_CONTROLLER = "http://127.0.0.1:${config.API_CONTROLLER_PORT}"
-debug = config.DEBUGGING
+
+API_CONTROLLER = "http://127.0.0.1:" + config["API_CONTROLLER_PORT"]
 
 # Door state constants.
-STATE_UP = config.STATE_UP
-STATE_DOWN = config.STATE_DOWN
-STATE_BETWEEN = config.STATE_BETWEEN
+STATE_UP = config["STATE_UP"]
+STATE_DOWN = config["STATE_DOWN"]
+STATE_BETWEEN = config["STATE_BETWEEN"]
 
 # With static_url_path Flask serves all assets under the /static
 # with no further configuration.
 app = Flask(__name__, static_url_path='/static')
 listen_to_ip = '0.0.0.0'
-listen_to_port = config.API_WEB_PORT
+listen_to_port = config["API_WEB_PORT"]
 
 # Routes are in webUtils.
 

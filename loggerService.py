@@ -14,15 +14,14 @@ for k, v in config.items():
     elif v == 'True':
         config[k] = True
 
-
+debug = config["DEBUG"]
 fileName = os.path.basename(__file__)
-debug=config.DEBUG
 
 lock = threading.Lock()
 logFilePath = "/home/pi/GarageWeb/static/log.txt"
 app = Flask(__name__)
 listen_to_ip = '127.0.0.1'
-listen_to_port = config.API_LOGGER_PORT
+listen_to_port = config["API_LOGGER_PORT"]
 
 def write(msg, fileName):
     global debug, logFilePath

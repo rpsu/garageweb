@@ -13,16 +13,17 @@ for k, v in config.items():
     elif v == 'True':
         config[k] = True
 
+debug = config["DEBUG"]
 fileName = os.path.basename(__file__)
-API_CONTROLLER = "http://127.0.0.1:${config.API_CONTROLLER_PORT}"
-API_LOGGER = "http://127.0.0.1:${config.API_LOGGER_PORT}"
+
+API_CONTROLLER = "http://127.0.0.1:" + config["API_CONTROLLER_PORT"]
+API_LOGGER = "http://127.0.0.1:" + config["API_LOGGER_PORT"]
 
 # Door state constants.
-STATE_UP = config.STATE_UP
-STATE_DOWN = config.STATE_DOWN
-STATE_BETWEEN = config.STATE_BETWEEN
+STATE_UP = config["STATE_UP"]
+STATE_DOWN = config["STATE_DOWN"]
+STATE_BETWEEN = config["STATE_BETWEEN"]
 
-debug = config.DEBUG
 
 # Close door automatically after seconds (if left fully opened)
 DoorAutoCloseDelay = 360

@@ -17,9 +17,8 @@ for k, v in config.items():
 
 fileName = os.path.basename(__file__)
 
-API_CONTROLLER = "http://127.0.0.1:${config.API_CONTROLLER_PORT}"
-API_LOGGER = "http://127.0.0.1:${config.API_LOGGER_PORT}"
-
+API_CONTROLLER = "http://127.0.0.1:" + config["API_CONTROLLER_PORT"]
+API_LOGGER = "http://127.0.0.1:" + config["API_LOGGER_PORT"]
 
 # APIs, Logger API
 def logger(msg):
@@ -74,14 +73,4 @@ def user_ip_address(request):
 
 # Get current password from a file.
 def get_door_pwd():
-    passwd_file = 'garage-password.txt'
-    cwd = os.path.dirname(os.path.abspath(__file__))
-    file = os.path.join(cwd, passwd_file)
-    if os.path.isfile(file):
-        logger(f"Using passwd from a file '{file}'.")
-        # Reads all of the content without newlines into a password.
-        with open(file) as f:
-            return f.read().splitlines()[0]
-    else:
-        logger(f"Passwd file '{file}' was not found. Using default passwd.")
-        return config.DoorPassword
+    return config["DoorPassword"]
