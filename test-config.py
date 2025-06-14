@@ -11,10 +11,16 @@ config = {
     **dotenv_values(".env.default"),  # load what came with the repo
     **dotenv_values(".env"),  # load overrides from the local
 }
-print("Config loaded: " + str(config.__sizeof__) + " items.")
+for k, v in config.items():
+    if v == 'False':
+        config[k] = False
+    elif v == 'True':
+        config[k] = True
+
+print("Config loaded: " + str(len(config)) + " items.")
 line = 1
 for k, v in config.items():
-    print(str(line) + ": " + str(k) + " => " + str(v))
+    print(str(line) + ": " + str(k) + " => [" + str(type(v)) + "] " + str(v))
     line = line + 1
 
 print("Done.")
