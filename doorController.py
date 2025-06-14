@@ -25,7 +25,7 @@ if debug:
     for k, v in config.items():
         print(str(k) + " => [" + str(type(v)) + "] " + str(v))
 
-API_LOGGER = "http://127.0.0.1:" + config.get("API_LOGGER_PORT")
+API_LOGGER = "http://127.0.0.1:" + str(config.get("API_LOGGER_PORT"))
 
 # With static_url_path Flask serves all assets under the /static
 # with no further configuration.
