@@ -13,7 +13,7 @@ config = {
 print("Config loaded: " + str(config.__sizeof__) + " items.")
 line = 1
 for k, v in config.items():
-    print(str(line) + ": " + str(k) + " => " + str(v))
+    print(str(line) + ": " + str(k) + " => [" type(v) + "] " + str(v))
     line = line + 1
 
 print("Done.")
