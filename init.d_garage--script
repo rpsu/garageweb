@@ -103,6 +103,7 @@ log-config)
   F=test-config.py
   python3 /home/pi/GarageWeb/${F}
   sleep 2
+  ;;
 
 start-logger)
   echo "Starting Logger Service"
