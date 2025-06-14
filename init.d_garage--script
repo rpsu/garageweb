@@ -35,14 +35,15 @@ fi
 case "$1" in
 start)
   # echo "5 sec delay to allow Pi with camera module wake up."
-  echo "5 sec delay to let logger start properly."
+  $0 log-config
   $0 start-logger
+  echo "5 sec delay to let logger start properly."
   sleep 5
-  echo "5 sec delay also to allow controller to boot."
   $0 start-controller
+  echo "5 sec delay also to allow controller to boot."
   sleep 5
-  echo "5 sec delay also to allow automator to boot."
   $0 start-automator
+  echo "5 sec delay also to allow automator to boot."
   sleep 5
   $0 start-web
   ;;
@@ -57,6 +58,7 @@ stop)
   ;;
 
 status)
+  $0 log-config
   F=loggerService.py
   PID=$(ps -ef | grep ${F} | grep python | awk {'print $2'} | xargs)
   if [ -f /var/run/garage.${F}.pid ] && [ ! -z "$PID" ]; then
@@ -95,6 +97,12 @@ restart)
   $0 stop
   $0 start
   ;;
+
+log-config)
+  echo "Configurations logger"
+  F=test-config.py
+  python3 /home/pi/GarageWeb/${F}
+  sleep 2
 
 start-logger)
   echo "Starting Logger Service"
@@ -199,7 +207,7 @@ stop-web)
 
 help | *)
   echo "Usage:"
-  echo "service garage {start|stop|restart|start-web|start-automator|stop-web|stop-automator|status|help}"
+  echo "service garage {start|stop|restart|start-web|start-automator|stop-web|stop-automator|log-config|status|help}"
   ;;
 esac
 
