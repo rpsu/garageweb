@@ -12,7 +12,11 @@ config = {
     **dotenv_values(".env"),  # load overrides from the local
 }
 print("Config loaded: " + str(config.__sizeof__) + " items.")
-print("config from dotenv: " + jsonify(config))
+line = 1
+for k, v in config.items():
+    print("${line}: ${k} => ${v}")
+    line = line + 1
+
 print("Done.")
 
  
