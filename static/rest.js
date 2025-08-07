@@ -23,4 +23,4 @@ const restApiDoor = () => {
 restApiDoor();
 
 // Call it repeatedly.
-setInterval(restApiDoor, 15 * 1000)
+setInterval(restApiDoor, 5 * 1000)
