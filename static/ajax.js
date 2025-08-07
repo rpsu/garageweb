@@ -3,16 +3,26 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         const formData = new FormData(form);
+
+        clearInput();
         fetch(form.action, {
                 method: form.method,
                 body: formData,
             })
             .then(response => response.json())
             .then(data => {
-                // handle response if needed
+                console.debug(data);
             });
     });
     form.password.addEventListener('blur', function() {
         form.requestSubmit();
     });
 });
+
+function clearInput() {
+    const input = document.getElementById('garagepwd');
+    input.value = '';
+    input.setAttribute('disabled', false);
+    input.setAttribute('value', '');
+    input.focus();
+}
