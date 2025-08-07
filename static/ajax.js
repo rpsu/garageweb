@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function clearInput() {
     const input = document.getElementById('garagepwd');
     input.value = '';
-    input.setAttribute('disabled', false);
-    input.setAttribute('value', '');
+    if (input.hasAttribute('disabled')) {
+        input.removeAttribute('disabled');
+    }
     input.focus();
 }
