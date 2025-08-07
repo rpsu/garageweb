@@ -22,13 +22,15 @@
     <meta name="msapplication-TileImage" content="/static/favicon/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" type="text/css" href="/static/stylesheet.css">
+    <script type="text/javascript" src="/static/ajax.js" defer></script>
     <script type="text/javascript" src="/static/rest.js" defer></script>
 </head>
 
 <body class="red">
     <div class="container">
         <form action="/api/toggle" method="post" id="garageform">
-            <input name="password" type="password" onblur="this.form.submit();" pattern="[a-z0-9\s_-]*" value="">
+            <input name="password" type="password" pattern="[a-z0-9\s_-]*" value="">
+            <button type="submit" style="border: 1px blueviolet; border-radius: 3px;"></button>
         </form>
         <a href="/"><img id="status-imge" src="/static/images/GarageRed.gif"></a>
         <br />
