@@ -103,7 +103,7 @@ def restApiDoor():
 def openTheDoorPlease():
     # the Password that Opens Garage Door (Code if Password is Correct)
     user_ip = user_ip_address(request)
-    name = request.form['garagecode']
+    name = request.form['password']
     if name != get_door_pwd():
         logger("Wrong password provided, request originated from IP " +
                user_ip)
