@@ -11,11 +11,12 @@ document.addEventListener('DOMContentLoaded', function() {
             method: form.method,
             body: formData,
         })
-        .then(response => console.debug(response.status, response.statusText))
-        .then(response => console.debug(response.status, response.statusText))
-        .then(() => {
+        .then((response) => {
             button.removeAttribute('disabled');
-        });
+            return response
+        })
+        .then(response => console.debug(response.status, response.statusText))
+        .then(response => console.debug(response))
     });
 });
 
