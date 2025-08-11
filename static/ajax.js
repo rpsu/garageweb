@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: form.method,
                 body: formData,
             })
-            .then(response => console.debug(response.json()))
+            .then(response => console.debug(response.status, response.statusText))
             .then(() => {
                 button.removeAttribute('disabled');
             })
