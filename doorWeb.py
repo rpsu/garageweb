@@ -98,7 +98,7 @@ def restApiDoor():
 
 # Main route for POST requests (ie. door open/close requests)
 # Routes, API endpoint POST /api/toggle endpoint
-@ app.route('/api/toggle', methods=['POST'])
+@ app.route('/', methods=['POST'])
 def openTheDoorPlease():
     # the Password that Opens Garage Door (Code if Password is Correct)
     user_ip = user_ip_address(request)
