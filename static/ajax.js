@@ -3,8 +3,10 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         const formData = new FormData(form);
-
+        const button = document.getElementById('toggleButton');
+        button.disabled = true
         clearInput();
+
         fetch(form.action, {
                 method: form.method,
                 body: formData,
@@ -12,11 +14,15 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 console.debug(data);
-            });
+            })
+            .then(() => {
+                button.disabled = true
+            })
+;
     });
-    form.password.addEventListener('blur', function() {
-        form.requestSubmit();
-    });
+    // form.password.addEventListener('blur', function() {
+    //     form.requestSubmit();
+    // });
 });
 
 function clearInput() {
