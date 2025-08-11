@@ -7,14 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
         button.disabled = true
         clearInput();
 
-        fetch(() => {
-            form.action, {
-                method: form.method,
-                body: formData,
-            }
+        fetch(form.action, {
+            method: form.method,
+            body: formData,
         })
         .then(response => console.debug(response.status, response.statusText))
-        .then(response => console.debug(response))
+        .then(response => console.debug(response.status, response.statusText))
         .then(() => {
             button.removeAttribute('disabled');
         });
