@@ -5,6 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
         button.disabled = true
 
         const input = document.getElementById('garagepwd');
-        input.value = '';
+        input.disabled = true;
     });
 })
