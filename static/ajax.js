@@ -11,12 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: form.method,
                 body: formData,
             })
-            .then(response => response.json())
-            .then(data => {
-                console.debug(data);
-            })
+            .then(response => console.debug(response.json()))
             .then(() => {
-                button.disabled = true
+                button.removeAttribute('disabled');
             })
 ;
     });
