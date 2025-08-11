@@ -5,8 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(form);
         const button = document.getElementById('toggleButton');
         button.disabled = true
-
-        document.getElementById('garagepwd').value = ''
+        clearInput();
 
         fetch(() => {
             form.action, {
@@ -21,3 +20,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+function clearInput() {
+    const input = document.getElementById('garagepwd');
+    input.value = '';
+    if (input.hasAttribute('disabled')) {
+        input.removeAttribute('disabled');
+    }
+    input.focus();
+}
